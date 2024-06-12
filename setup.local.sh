@@ -97,30 +97,33 @@ else
   echo "Installation and configuration cancelled by user."
 fi
 
-read -p "Do you want to install NVM (Node Version Manager)? (y/n) " install_choice
+#!/bin/bash
+
+# Ask user if they want to install Node.js and npm using NVM
+read -p "Do you want to install Node.js and npm using NVM? (y/n) " install_choice
 if [[ "$install_choice" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-# Update package index
-sudo apt-get update
 
-# Install required packages
-sudo apt-get install -y build-essential libssl-dev
+  # Update package index
+  sudo apt-get update
 
-# Download and install NVM
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+  # Install required packages
+  sudo apt-get install -y build-essential libssl-dev
 
-# Source NVM script to add nvm command to the current shell session
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  # Download and install NVM
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 
-# Install the latest LTS version of Node.js
-nvm install --lts
+  # Source NVM script to add nvm command to the current shell session
+  export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-# Verify installation
-node -v
-npm -v
+  # Install the latest LTS version of Node.js
+  nvm install --lts
 
-  else
-    echo "NVM install cancelled by user."
-  fi
+  # Verify installation
+  node -v
+  npm -v
 
+else
+  echo "Installation cancelled by user."
 fi
+
