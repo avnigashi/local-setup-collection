@@ -38,3 +38,12 @@ The Windows setup script performs the following tasks:
     ```bash
     ./setup.local.linux.sh
     ```
+    
+### Windows Setup Script
+   ```bash
+    ./setup.local.windows.py
+    ```
+Run the script using Python:
+   ```bash
+python /setup.local.windows.py
+    ```
