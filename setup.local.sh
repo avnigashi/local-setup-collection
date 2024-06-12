@@ -55,3 +55,44 @@ if [ "$(uname -s)" == "Linux" ] && [ -z "$(grep -i microsoft /proc/version)" ]; 
   fi
 
 fi
+
+# Ask user if they want to install Git and configure SSH for GitHub
+read -p "Do you want to install Git and configure SSH for GitHub? (y/n) " install_choice
+if [[ "$install_choice" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+
+  # Update package index
+  sudo apt-get update
+
+  # Install Git
+  sudo apt-get install -y git
+
+  # Check for existing SSH keys
+  if [ -f ~/.ssh/id_rsa ]; then
+    echo "An existing SSH key pair was found. Do you want to overwrite it? (y/n)"
+    read overwrite
+    if [ "$overwrite" != "y" ]; then
+      echo "Exiting without creating a new SSH key pair."
+      exit 0
+    fi
+  fi
+
+  # Generate a new SSH key pair
+  echo "Enter your email address for the SSH key:"
+  read email
+  ssh-keygen -t rsa -b 4096 -C "$email" -f ~/.ssh/id_rsa -N ""
+
+  # Start the ssh-agent in the background
+  eval "$(ssh-agent -s)"
+
+  # Add the SSH private key to the ssh-agent
+  ssh-add ~/.ssh/id_rsa
+
+  # Display the public key
+  echo "Your new SSH public key has been generated:"
+  cat ~/.ssh/id_rsa.pub
+
+  # Instructions to add SSH key to GitHub
+  echo "Copy the above SSH key and add it to your GitHub account under Settings > SSH and GPG keys."
+else
+  echo "Installation and configuration cancelled by user."
+fi
