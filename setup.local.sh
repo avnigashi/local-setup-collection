@@ -1,11 +1,11 @@
 #!/bin/bash
+  read -p "Do you want to install Docker and Docker Compose? (y/n) " response
+  if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
 
 # Check if the system is Linux and not WSL
 if [ "$(uname -s)" == "Linux" ] && [ -z "$(grep -i microsoft /proc/version)" ]; then
 
   # Prompt user to confirm Docker installation
-  read -p "Do you want to install Docker and Docker Compose? (y/n) " response
-  if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
 
     # Update package index
     sudo apt-get update
