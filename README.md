@@ -40,10 +40,8 @@ The Windows setup script performs the following tasks:
     ```
     
 ### Windows Setup Script
-   ```bash
+1. Save the script as `setup.local.windows.py`.
+2. Run the script:
+    ```bash
     ./setup.local.windows.py
-    ```
-Run the script using Python:
-   ```bash
-python /setup.local.windows.py
     ```
