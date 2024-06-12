@@ -121,6 +121,25 @@ if [[ "$node_choice" =~ ^([yY][eE][sS]|[yY])$ ]]; then
   node -v
   npm -v
 
+  # Ask user if they want to install Yarn or pnpm or none
+  read -p "Do you want to install Yarn, pnpm, or none? (yarn/pnpm/none) " package_manager_choice
+  case "$package_manager_choice" in
+    yarn)
+      npm install -g yarn
+      yarn -v
+      ;;
+    pnpm)
+      npm install -g pnpm
+      pnpm -v
+      ;;
+    none)
+      echo "No additional package manager will be installed."
+      ;;
+    *)
+      echo "Invalid choice. No additional package manager will be installed."
+      ;;
+  esac
+
 else
   echo "Node.js installation cancelled by user."
 fi
