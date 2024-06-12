@@ -1,11 +1,11 @@
 #!/bin/bash
-  read -p "Do you want to install Docker and Docker Compose? (y/n) " response
-  if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
 
-# Check if the system is Linux and not WSL
-if [ "$(uname -s)" == "Linux" ] && [ -z "$(grep -i microsoft /proc/version)" ]; then
+# Ask user if they want to install Docker and Docker Compose
+read -p "Do you want to install Docker and Docker Compose? (y/n) " docker_choice
+if [[ "$docker_choice" =~ ^([yY][eE][sS]|[yY])$ ]]; then
 
-  # Prompt user to confirm Docker installation
+  # Check if the system is Linux and not WSL
+  if [ "$(uname -s)" == "Linux" ] && [ -z "$(grep -i microsoft /proc/version)" ]; then
 
     # Update package index
     sudo apt-get update
@@ -50,15 +50,15 @@ if [ "$(uname -s)" == "Linux" ] && [ -z "$(grep -i microsoft /proc/version)" ]; 
 
     # Optionally, reboot the system
     # sudo reboot
-  else
-    echo "Installation cancelled by user."
-  fi
 
+  fi
+else
+  echo "Docker installation cancelled by user."
 fi
 
 # Ask user if they want to install Git and configure SSH for GitHub
-read -p "Do you want to install Git and configure SSH for GitHub? (y/n) " install_choice
-if [[ "$install_choice" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+read -p "Do you want to install Git and configure SSH for GitHub? (y/n) " git_choice
+if [[ "$git_choice" =~ ^([yY][eE][sS]|[yY])$ ]]; then
 
   # Update package index
   sudo apt-get update
@@ -94,14 +94,12 @@ if [[ "$install_choice" =~ ^([yY][eE][sS]|[yY])$ ]]; then
   # Instructions to add SSH key to GitHub
   echo "Copy the above SSH key and add it to your GitHub account under Settings > SSH and GPG keys."
 else
-  echo "Installation and configuration cancelled by user."
+  echo "Git installation cancelled by user."
 fi
 
-#!/bin/bash
-
 # Ask user if they want to install Node.js and npm using NVM
-read -p "Do you want to install Node.js and npm using NVM? (y/n) " install_choice
-if [[ "$install_choice" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+read -p "Do you want to install Node.js and npm using NVM? (y/n) " node_choice
+if [[ "$node_choice" =~ ^([yY][eE][sS]|[yY])$ ]]; then
 
   # Update package index
   sudo apt-get update
@@ -124,6 +122,36 @@ if [[ "$install_choice" =~ ^([yY][eE][sS]|[yY])$ ]]; then
   npm -v
 
 else
-  echo "Installation cancelled by user."
+  echo "Node.js installation cancelled by user."
 fi
 
+# Ask user if they want to install Python and related tools
+read -p "Do you want to install Python and related tools? (y/n) " python_choice
+if [[ "$python_choice" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+
+  # Update package list and upgrade packages
+  sudo apt update && sudo apt upgrade -y
+
+  # Install Python 3
+  sudo apt install -y python3 python3-dev python3-venv python3-pip python-is-python3
+
+  # Verify installations
+  python3 --version
+  pip3 --version
+
+  # Upgrade pip
+  pip3 install --upgrade pip
+
+  # Install virtualenv (if needed)
+  pip3 install virtualenv
+
+  # Verify virtualenv installation
+  virtualenv --version
+
+  echo "Python, pip, and virtual environment setup is complete."
+  echo "To create a virtual environment, run: python3 -m venv <your-env-name>"
+  echo "To activate the virtual environment, run: source <your-env-name>/bin/activate"
+  echo "To deactivate the virtual environment, simply run: deactivate"
+else
+  echo "Python installation cancelled by user."
+fi
