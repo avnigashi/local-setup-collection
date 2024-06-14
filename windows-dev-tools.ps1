@@ -27,6 +27,14 @@ $phpVersions = @{
     "8.3.8"  = "https://windows.php.net/downloads/releases/php-8.3.8-Win32-vs16-x64.zip"
 }
 
+$pythonVersions = @{
+    "3.8.10" = "https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe"
+    "3.9.13" = "https://www.python.org/ftp/python/3.9.13/python-3.9.13-amd64.exe"
+    "3.10.7" = "https://www.python.org/ftp/python/3.10.7/python-3.10.7-amd64.exe"
+    "3.11.4" = "https://www.python.org/ftp/python/3.11.4/python-3.11.4-amd64.exe"
+    "3.12.3" = "https://www.python.org/ftp/python/3.12.3/python-3.12.3-amd64.exe"
+}
+
 # Display menu
 function Show-Menu {
     cls
@@ -46,6 +54,18 @@ function Show-Menu {
 function Show-PHPVersions {
     Write-Host "Select PHP version to install:"
     $phpVersions.Keys | ForEach-Object { Write-Host "$($_)" }
+    Write-Host "Back to main menu (type 'menu')"
+}
+
+function Show-PythonSubMenu {
+    Write-Host "Select Python version to install:"
+    Write-Host "1. Python 3.8.10"
+    Write-Host "2. Python 3.9.13"
+    Write-Host "3. Python 3.10.7"
+    Write-Host "4. Python 3.11.4"
+    Write-Host "5. Python 3.12.3"
+    Write-Host "6. LTS (Long Term Support)"
+    Write-Host "7. Specify a version"
     Write-Host "Back to main menu (type 'menu')"
 }
 
@@ -260,17 +280,15 @@ function Install-Yarn-Pnpm {
 
 # Install Python
 function Install-Python {
-    Start-Process -FilePath "winget" -ArgumentList "install -e --id Python.Python.3" -Wait
+    param (
+        [string]$pythonVersion,
+        [string]$pythonUrl
+    )
+    $installerPath = "$env:TEMP\python-$pythonVersion-amd64.exe"
+    Invoke-WebRequest -Uri $pythonUrl -OutFile $installerPath
+    Start-Process -FilePath $installerPath -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1" -Wait
     if ($?) {
-        python --version
-        pip --version
-        pip install --upgrade pip
-        pip install virtualenv
-        virtualenv --version
-        Write-Host "Python, pip, and virtual environment setup is complete."
-        Write-Host "To create a virtual environment, run: python -m venv <your-env-name>"
-        Write-Host "To activate the virtual environment, run: <your-env-name>\Scripts\activate"
-        Write-Host "To deactivate the virtual environment, simply run: deactivate"
+        Write-Host "Python $pythonVersion has been installed successfully."
     } else {
         Write-Host "Failed to install Python."
     }
@@ -358,7 +376,23 @@ while ($true) {
             Configure-SSH-For-GitHub
         }
         9 {
-            Install-Python
+            Show-PythonSubMenu
+            $pythonChoice = Read-Host "Enter your choice or 'menu' to return to the main menu"
+            if ($pythonChoice -eq 'menu') { continue }
+            switch ($pythonChoice) {
+                1 { Install-Python -pythonVersion "3.8.10" -pythonUrl $pythonVersions["3.8.10"] }
+                2 { Install-Python -pythonVersion "3.9.13" -pythonUrl $pythonVersions["3.9.13"] }
+                3 { Install-Python -pythonVersion "3.10.7" -pythonUrl $pythonVersions["3.10.7"] }
+                4 { Install-Python -pythonVersion "3.11.4" -pythonUrl $pythonVersions["3.11.4"] }
+                5 { Install-Python -pythonVersion "3.12.3" -pythonUrl $pythonVersions["3.12.3"] }
+                6 { Install-Python -pythonVersion "3.10.7" -pythonUrl $pythonVersions["3.10.7"] } # Assuming 3.10.7 as LTS
+                7 {
+                    $specificVersion = Read-Host "Enter the specific Python version to install (e.g., 3.9.1)"
+                    $specificUrl = "https://www.python.org/ftp/python/$specificVersion/python-$specificVersion-amd64.exe"
+                    Install-Python -pythonVersion $specificVersion -pythonUrl $specificUrl
+                }
+                default { Write-Host "Invalid choice. Please try again." }
+            }
         }
         10 {
             exit
