@@ -1,6 +1,5 @@
 # Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
 
-
 # Check and Set Execution Policy
 function Set-ExecutionPolicy-RemoteSigned {
     $currentPolicy = Get-ExecutionPolicy -Scope CurrentUser
@@ -289,13 +288,13 @@ while ($true) {
             $phpChoice = Read-Host "Enter your choice or 'menu' to return to the main menu"
             if ($phpChoice -eq 'menu') { continue }
             if ($phpVersions.ContainsKey($phpChoice)) {
-                Install-PHP -phpVersion $phpChoice -phpUrl $phpVersions[$phpChoice]
+                Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File .\Install-PHP.ps1 -phpVersion $phpChoice -phpUrl $($phpVersions[$phpChoice])" -Wait
             } else {
                 Write-Host "Invalid choice. Please try again."
             }
         }
         2 {
-            Install-Composer
+            Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File .\Install-Composer.ps1" -Wait
         }
         3 {
             Show-NodeSubMenu
@@ -308,10 +307,11 @@ while ($true) {
                     if ($installChoice -eq 'menu') { continue }
                     switch ($installChoice) {
                         1 {
-                            Install-Node-With-Nvm -nodeVersion (Read-Host "Enter the Node.js version to install (e.g., 14.17.0, latest, lts)")
+                            $nodeVersion = Read-Host "Enter the Node.js version to install (e.g., 14.17.0, latest, lts)"
+                            Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File .\Install-Node-With-Nvm.ps1 -nodeVersion $nodeVersion" -Wait
                         }
                         2 {
-                            Install-Latest-Node-Natively
+                            Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File .\Install-Latest-Node-Natively.ps1" -Wait
                         }
                         default {
                             Write-Host "Invalid choice. Please try again."
@@ -324,10 +324,11 @@ while ($true) {
                     if ($installChoice -eq 'menu') { continue }
                     switch ($installChoice) {
                         1 {
-                            Install-Custom-Node-Natively
+                            $nodeVersion = Read-Host "Enter the Node.js version to install (e.g., 14.17.0)"
+                            Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File .\Install-Custom-Node-Natively.ps1 -nodeVersion $nodeVersion" -Wait
                         }
                         2 {
-                            Install-Latest-Node-Natively
+                            Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File .\Install-Latest-Node-Natively.ps1" -Wait
                         }
                         default {
                             Write-Host "Invalid choice. Please try again."
@@ -340,27 +341,27 @@ while ($true) {
             }
         }
         4 {
-            Install-npm
+            Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File .\Install-npm.ps1" -Wait
         }
         5 {
-            Install-pnpm
+            Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File .\Install-pnpm.ps1" -Wait
         }
         6 {
-            Install-Yarn
+            Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File .\Install-Yarn.ps1" -Wait
         }
         7 {
-            Install-Docker-Desktop
-            Enable-WSL2
-            Configure-Docker-Desktop
-            Set-WSL-Distro-Version -distroName "Ubuntu"
-            Configure-WSL-Integration
+            Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File .\Install-Docker-Desktop.ps1" -Wait
+            Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File .\Enable-WSL2.ps1" -Wait
+            Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File .\Configure-Docker-Desktop.ps1" -Wait
+            Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File .\Set-WSL-Distro-Version.ps1 -distroName 'Ubuntu'" -Wait
+            Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File .\Configure-WSL-Integration.ps1" -Wait
         }
         8 {
-            Install-Git
-            Configure-SSH-For-GitHub
+            Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File .\Install-Git.ps1" -Wait
+            Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File .\Configure-SSH-For-GitHub.ps1" -Wait
         }
         9 {
-            Install-Python
+            Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File .\Install-Python.ps1" -Wait
         }
         10 {
             exit
