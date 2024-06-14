@@ -1,3 +1,6 @@
+# Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+
+
 # Check and Set Execution Policy
 function Set-ExecutionPolicy-RemoteSigned {
     $currentPolicy = Get-ExecutionPolicy -Scope CurrentUser
