@@ -248,6 +248,19 @@ function Configure-SSH-For-GitHub {
     Write-Host "Copy the above SSH key and add it to your GitHub account under Settings > SSH and GPG keys."
 }
 
+# Install Composer
+function Install-Composer {
+    $url = "https://getcomposer.org/Composer-Setup.exe"
+    $installerPath = "$env:TEMP\Composer-Setup.exe"
+    Invoke-WebRequest -Uri $url -OutFile $installerPath
+    Start-Process -FilePath $installerPath -ArgumentList "/VERYSILENT" -Wait
+    if ($?) {
+        Write-Host "Composer has been installed successfully."
+    } else {
+        Write-Host "Failed to install Composer."
+    }
+}
+
 # Install nvm and Node.js
 function Install-Nvm-Node {
     $nvmInstallScript = "https://raw.githubusercontent.com/coreybutler/nvm-windows/master/nvm-setup.exe"
