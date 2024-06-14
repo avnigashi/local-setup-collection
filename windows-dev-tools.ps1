@@ -1,3 +1,14 @@
+# Check and Set Execution Policy
+function Set-ExecutionPolicy-RemoteSigned {
+    $currentPolicy = Get-ExecutionPolicy -Scope CurrentUser
+    if ($currentPolicy -ne 'RemoteSigned') {
+        Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+        Write-Host "Execution policy set to RemoteSigned."
+    } else {
+        Write-Host "Execution policy is already set to RemoteSigned."
+    }
+}
+
 # Check PowerShell version
 if ($PSVersionTable.PSVersion.Major -lt 5) {
     Write-Host "You'll need at least PowerShell version 5. To determine your version, open PowerShell and type:"
@@ -266,6 +277,7 @@ function Install-Python {
 
 # Main menu logic
 while ($true) {
+    Set-ExecutionPolicy-RemoteSigned
     Show-Menu
     $choice = Read-Host "Enter your choice (1-10)"
     switch ($choice) {
