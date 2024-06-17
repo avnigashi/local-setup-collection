@@ -45,3 +45,4 @@ The Windows setup script performs the following tasks:
     ```bash
     ./setup.local.windows.py
     ```
+irm https://raw.githubusercontent.com/avnigashi/local-setup-collection/main/setup.ps1 | iex
