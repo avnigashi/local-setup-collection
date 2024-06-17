@@ -82,35 +82,3 @@ function Show-Menu {
 }
 
 # Main execution loop
-Ensure-ExecutionPolicy
-Verify-PowerShellVersion
-
-do {
-    Show-Menu
-    $input = Read-Host "Please make a selection"
-    switch ($input) {
-        '1' {
-            Write-Host "Available PHP versions: 7.4.33, 8.0.30, 8.1.29, 8.2.20, 8.3.8"
-            $version = Read-Host "Enter PHP version"
-            Install-PHP -Version $version
-        }
-        '2' {
-            Install-Composer
-        }
-        '3' {
-            $version = Read-Host "Enter Node.js version (e.g., 14.15.1)"
-            Install-Node -Version $version
-        }
-        '4' {
-            $version = Read-Host "Enter Yarn version (e.g., 1.22.5)"
-            Install-Yarn -Version $version
-        }
-        'Q' {
-            Write-Host "Exiting script..."
-            break
-        }
-        default {
-            Write-Host "Invalid option, please try again."
-        }
-    }
-} while ($input -ne 'Q')
