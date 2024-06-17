@@ -66,7 +66,7 @@ function Install-Yarn {
     $url = "https://github.com/yarnpkg/yarn/releases/download/v$Version/yarn-$Version.msi"
     Write-Host "Downloading Yarn $Version from $url..."
     Invoke-WebRequest -Uri $url -OutFile "yarn.msi"
-    Start-Process msiexec.exe -ArgumentList "/i yarn.msi /quiet" -Wait
+    Start-Process msiexec.exe -ArgumentList "/i yarn.msi /quiet" -Wait -NoNewWindow
     Remove-Item "yarn.msi"
     Write-Host "Yarn $Version installed."
 }
