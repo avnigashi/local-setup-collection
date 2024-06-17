@@ -1,36 +1,45 @@
 # Ensure the script runs with appropriate execution policies
-function Set-ExecutionPolicy-IfNeeded {
-    try {
-        $currentPolicy = Get-ExecutionPolicy -Scope CurrentUser
-        if ($currentPolicy -ne 'RemoteSigned') {
-            Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
-            Write-Host "Execution policy set to RemoteSigned."
-        }
-    } catch {
-        Write-Host "Failed to set execution policy. Run PowerShell as Administrator."
+function Ensure-ExecutionPolicy {
+    $currentPolicy = Get-ExecutionPolicy -Scope CurrentUser
+    if ($currentPolicy -ne 'RemoteSigned') {
+        Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+        Write-Host "Execution policy set to RemoteSigned."
     }
 }
 
-# Check PowerShell version before proceeding
-function Check-PowerShellVersion {
+# Check PowerShell version requirement
+function Verify-PowerShellVersion {
     if ($PSVersionTable.PSVersion.Major -lt 5) {
-        Write-Host "PowerShell version 5 or higher is required. Your version: $($PSVersionTable.PSVersion)"
+        Write-Host "PowerShell 5 or newer is required. Please update your version."
         exit
     }
 }
 
-# Function definitions for software installation
+# Function to install PHP
 function Install-PHP {
     Param ([string]$Version)
-    $url = "https://windows.php.net/downloads/releases/php-$Version-Win32-VC15-x64.zip"
-    $output = "php.zip"
-    Write-Host "Downloading PHP $Version..."
-    Invoke-WebRequest -Uri $url -OutFile $output
-    Expand-Archive -Path $output -DestinationPath "C:\PHP\$Version"
-    Remove-Item $output
-    Write-Host "PHP $Version installed."
+    $phpUrls = @{
+        "7.4.33" = "https://windows.php.net/downloads/releases/php-7.4.33-Win32-vc15-x64.zip"
+        "8.0.30" = "https://windows.php.net/downloads/releases/php-8.0.30-Win32-vs16-x64.zip"
+        "8.1.29" = "https://windows.php.net/downloads/releases/php-8.1.29-Win32-vs16-x64.zip"
+        "8.2.20" = "https://windows.php.net/downloads/releases/php-8.2.20-Win32-vs16-x64.zip"
+        "8.3.8"  = "https://windows.php.net/downloads/releases/php-8.3.8-Win32-vs16-x64.zip"
+    }
+
+    if ($phpUrls.ContainsKey($Version)) {
+        $url = $phpUrls[$Version]
+        $output = "php.zip"
+        Write-Host "Downloading PHP $Version from $url..."
+        Invoke-WebRequest -Uri $url -OutFile $output
+        Expand-Archive -Path $output -DestinationPath "C:\PHP\$Version"
+        Remove-Item $output
+        Write-Host "PHP $Version installed at C:\PHP\$Version"
+    } else {
+        Write-Host "Invalid PHP version. Please choose a valid version."
+    }
 }
 
+# Function to install Composer
 function Install-Composer {
     Write-Host "Installing Composer..."
     Invoke-WebRequest -Uri "https://getcomposer.org/installer" -OutFile "composer-setup.php"
@@ -39,21 +48,23 @@ function Install-Composer {
     Write-Host "Composer installed."
 }
 
+# Function to install Node.js
 function Install-Node {
     Param ([string]$Version)
     $url = "https://nodejs.org/dist/v$Version/node-v$Version-win-x64.zip"
     $output = "node.zip"
-    Write-Host "Downloading Node.js $Version..."
+    Write-Host "Downloading Node.js $Version from $url..."
     Invoke-WebRequest -Uri $url -OutFile $output
     Expand-Archive -Path $output -DestinationPath "C:\Nodejs\$Version"
     Remove-Item $output
-    Write-Host "Node.js $Version installed."
+    Write-Host "Node.js $Version installed at C:\Nodejs\$Version"
 }
 
+# Function to install Yarn
 function Install-Yarn {
     Param ([string]$Version)
     $url = "https://github.com/yarnpkg/yarn/releases/download/v$Version/yarn-$Version.msi"
-    Write-Host "Downloading Yarn $Version..."
+    Write-Host "Downloading Yarn $Version from $url..."
     Invoke-WebRequest -Uri $url -OutFile "yarn.msi"
     Start-Process msiexec.exe -ArgumentList "/i yarn.msi /quiet" -Wait
     Remove-Item "yarn.msi"
@@ -70,16 +81,17 @@ function Show-Menu {
     Write-Host "Q: Quit"
 }
 
-# Main execution block
-Set-ExecutionPolicy-IfNeeded
-Check-PowerShellVersion
+# Main execution loop
+Ensure-ExecutionPolicy
+Verify-PowerShellVersion
 
 do {
     Show-Menu
-    $input = Read-Host "Enter your choice"
+    $input = Read-Host "Please make a selection"
     switch ($input) {
         '1' {
-            $version = Read-Host "Enter PHP version (e.g., 7.4.1)"
+            Write-Host "Available PHP versions: 7.4.33, 8.0.30, 8.1.29, 8.2.20, 8.3.8"
+            $version = Read-Host "Enter PHP version"
             Install-PHP -Version $version
         }
         '2' {
@@ -94,7 +106,7 @@ do {
             Install-Yarn -Version $version
         }
         'Q' {
-            Write-Host "Exiting..."
+            Write-Host "Exiting script..."
             break
         }
         default {
