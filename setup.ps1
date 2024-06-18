@@ -38,7 +38,7 @@ function Show-Menu {
     Write-Host "Select an option to install:"
     Write-Host "1. Install PHP"
     Write-Host "2. Install Composer"
-    Write-Host "3. Install Node.js"
+    Write-Host "3. Install Node.js via nvm"
     Write-Host "4. Install npm"
     Write-Host "5. Install pnpm"
     Write-Host "6. Install Yarn"
@@ -50,20 +50,6 @@ function Show-PHPVersions {
     Write-Host "Select PHP version to install:"
     $phpVersions.Keys | ForEach-Object { Write-Host "$($_)" }
     Write-Host "Back to main menu (type 'menu')"
-}
-
-function Show-NodeSubMenu {
-    Write-Host "Install Node.js:"
-    Write-Host "1. Via nvm"
-    Write-Host "2. Natively"
-    Write-Host "Back to main menu (type 'menu')"
-}
-
-function Show-NodeInstallOptions {
-    Write-Host "Install Node.js:"
-    Write-Host "1. Specify a version"
-    Write-Host "2. Install latest version"
-    Write-Host "Back to previous menu (type 'menu')"
 }
 
 # Add to PATH
@@ -202,18 +188,15 @@ function Install-Composer {
 
 # Install nvm and Node.js
 function Install-Nvm-Node {
-    $nvmInstallScript = "https://raw.githubusercontent.com/coreybutler/nvm-windows/master/nvm-setup.exe"
+    $nvmInstallScript = "https://github.com/coreybutler/nvm-windows/releases/download/1.1.10/nvm-setup.exe"
     $installerPath = "$env:TEMP\nvm-setup.exe"
     Invoke-WebRequest -Uri $nvmInstallScript -OutFile $installerPath
     Start-Process -FilePath $installerPath -Wait
     if ($?) {
-        nvm install latest
-        nvm use latest
-        npm install -g npm
-        Write-Host "nvm and Node.js have been installed successfully."
+        Write-Host "nvm has been installed successfully."
         Add-ToPath -newPath "$env:APPDATA\nvm"
     } else {
-        Write-Host "Failed to install nvm and Node.js."
+        Write-Host "Failed to install nvm."
     }
 }
 
@@ -253,46 +236,7 @@ while ($true) {
             Install-Composer
         }
         3 {
-            Show-NodeSubMenu
-            $nodeChoice = Read-Host "Enter your choice (1-2) or 'menu' to return to the main menu"
-            if ($nodeChoice -eq 'menu') { continue }
-            switch ($nodeChoice) {
-                1 {
-                    Show-NodeInstallOptions
-                    $installChoice = Read-Host "Enter your choice (1-2) or 'menu' to return to the previous menu"
-                    if ($installChoice -eq 'menu') { continue }
-                    switch ($installChoice) {
-                        1 {
-                            Install-Node-With-Nvm -nodeVersion (Read-Host "Enter the Node.js version to install (e.g., 14.17.0, latest, lts)")
-                        }
-                        2 {
-                            Install-Latest-Node-Natively
-                        }
-                        default {
-                            Write-Host "Invalid choice. Please try again."
-                        }
-                    }
-                }
-                2 {
-                    Show-NodeInstallOptions
-                    $installChoice = Read-Host "Enter your choice (1-2) or 'menu' to return to the previous menu"
-                    if ($installChoice -eq 'menu') { continue }
-                    switch ($installChoice) {
-                        1 {
-                            Install-Custom-Node-Natively
-                        }
-                        2 {
-                            Install-Latest-Node-Natively
-                        }
-                        default {
-                            Write-Host "Invalid choice. Please try again."
-                        }
-                    }
-                }
-                default {
-                    Write-Host "Invalid choice. Please try again."
-                }
-            }
+            Install-Nvm-Node
         }
         4 {
             Install-npm
