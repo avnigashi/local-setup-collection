@@ -417,7 +417,9 @@ function DMA-Starten {
 
         # Change directory to UI path and start the UI
         Set-Location -Path $uiPath
-        yarn install
+        Start-Process powershell -ArgumentList "yarn install"
+
+       
         Start-Process powershell -ArgumentList "yarn dev:ui:start"
 
         Write-Host "Open the application at http://localhost:8080/"
