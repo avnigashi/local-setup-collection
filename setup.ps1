@@ -202,7 +202,9 @@ function Install-Nvm-Node {
 
 # Install Yarn or pnpm
 function Install-Yarn-Pnpm {
-    $choice = Read-Host "Do you want to install Yarn, pnpm, or none? (yarn/pnpm/none)"
+    param (
+        [string]$choice
+    )
     if ($choice -eq 'yarn') {
         npm install -g yarn
         Write-Host "Yarn has been installed successfully."
@@ -239,13 +241,14 @@ while ($true) {
             Install-Nvm-Node
         }
         4 {
-            Install-npm
+            npm install -g npm
+            Write-Host "npm has been installed successfully."
         }
         5 {
-            Install-pnpm
+            Install-Yarn-Pnpm -choice 'pnpm'
         }
         6 {
-            Install-Yarn
+            Install-Yarn-Pnpm -choice 'yarn'
         }
         7 {
             Install-Git
