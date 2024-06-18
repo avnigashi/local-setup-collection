@@ -299,9 +299,7 @@ function DMA-Env-Variablen-Setzen {
         [string]$projectRoot
     )
 
-    
-
-    
+    $projectRoot = Join-Path -Path $projectRoot -ChildPath "apps/dma-ukk"
 
     try {
         $envFilePath = Join-Path -Path $projectRoot -ChildPath "dev-ops\stacks\.env.template"
