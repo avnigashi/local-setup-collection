@@ -1,5 +1,4 @@
 # Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
-
 # Ensure the script runs with appropriate execution policies
 function Ensure-ExecutionPolicy {
     $currentPolicy = Get-ExecutionPolicy -Scope CurrentUser
@@ -17,15 +16,18 @@ function Verify-PowerShellVersion {
     }
 }
 
+# Determine the system architecture
+$is64Bit = [Environment]::Is64BitOperatingSystem
+
 # Function to install PHP
 function Install-PHP {
     Param ([string]$Version)
     $phpUrls = @{
-        "7.4.33" = "https://windows.php.net/downloads/releases/php-7.4.33-Win32-vc15-x64.zip"
-        "8.0.30" = "https://windows.php.net/downloads/releases/php-8.0.30-Win32-vs16-x64.zip"
-        "8.1.29" = "https://windows.php.net/downloads/releases/php-8.1.29-Win32-vs16-x64.zip"
-        "8.2.20" = "https://windows.php.net/downloads/releases/php-8.2.20-Win32-vs16-x64.zip"
-        "8.3.8"  = "https://windows.php.net/downloads/releases/php-8.3.8-Win32-vs16-x64.zip"
+        "7.4.33" = if ($is64Bit) { "https://windows.php.net/downloads/releases/php-7.4.33-Win32-vc15-x64.zip" } else { "https://windows.php.net/downloads/releases/php-7.4.33-Win32-vc15-x86.zip" }
+        "8.0.30" = if ($is64Bit) { "https://windows.php.net/downloads/releases/php-8.0.30-Win32-vs16-x64.zip" } else { "https://windows.php.net/downloads/releases/php-8.0.30-Win32-vs16-x86.zip" }
+        "8.1.29" = if ($is64Bit) { "https://windows.php.net/downloads/releases/php-8.1.29-Win32-vs16-x64.zip" } else { "https://windows.php.net/downloads/releases/php-8.1.29-Win32-vs16-x86.zip" }
+        "8.2.20" = if ($is64Bit) { "https://windows.php.net/downloads/releases/php-8.2.20-Win32-vs16-x64.zip" } else { "https://windows.php.net/downloads/releases/php-8.2.20-Win32-vs16-x86.zip" }
+        "8.3.8"  = if ($is64Bit) { "https://windows.php.net/downloads/releases/php-8.3.8-Win32-vs16-x64.zip" } else { "https://windows.php.net/downloads/releases/php-8.3.8-Win32-vs16-x86.zip" }
     }
 
     if ($phpUrls.ContainsKey($Version)) {
@@ -53,7 +55,7 @@ function Install-Composer {
 # Function to install Node.js
 function Install-Node {
     Param ([string]$Version)
-    $url = "https://nodejs.org/dist/v$Version/node-v$Version-win-x64.zip"
+    $url = if ($is64Bit) { "https://nodejs.org/dist/v$Version/node-v$Version-win-x64.zip" } else { "https://nodejs.org/dist/v$Version/node-v$Version-win-x86.zip" }
     $output = "node.zip"
     Write-Host "Downloading Node.js $Version from $url..."
     Invoke-WebRequest -Uri $url -OutFile $output
