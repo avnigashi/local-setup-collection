@@ -466,19 +466,11 @@ function SF-Einrichten {
             nvm install 18.12.0
             nvm use 18.12.0
         }
-        Start-Process powershell -ArgumentList " pnpm i" -NoNewWindow
-
-        Start-Process powershell -ArgumentList " pnpm run docker:up:db" -NoNewWindow
-        Start-Process powershell -ArgumentList " pnpm exec docker:up:build" -NoNewWindow
-
-       
-        
+        pnpm exec docker:up:db
+        pnpm exec docker:up:build
 
         Set-Location -Path $frontendPath
         pnpm exec docker:up:build
-        Start-Process powershell -ArgumentList " pnpm i" -NoNewWindow
-
-        Start-Process powershell -ArgumentList " pnpm exec docker:up:build" -NoNewWindow
 
         Write-Host "SF environment setup completed successfully."
     } catch {
