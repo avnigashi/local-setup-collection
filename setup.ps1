@@ -164,7 +164,7 @@ function Invoke-WebRequest-Retry {
 
 # Install Git
 function Install-Git {
-    $url = "https://github.com/git-for-windows/git/releases/latest/download/Git-2.36.1.1-64-bit.exe"
+    $url = if ($is64Bit) { "https://github.com/git-for-windows/git/releases/download/v2.45.2.windows.1/Git-2.45.2-64-bit.exe" } else { "https://github.com/git-for-windows/git/releases/download/v2.45.2.windows.1/Git-2.45.2-32-bit.exe" }
     $installerPath = "$env:TEMP\GitInstaller.exe"
     Invoke-WebRequest-Retry -url $url -outputPath $installerPath
     Start-Process -FilePath $installerPath -ArgumentList "/VERYSILENT" -Wait
