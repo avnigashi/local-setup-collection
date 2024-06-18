@@ -361,9 +361,9 @@ function DMA-Einrichten {
     param (
         [string]$projectRoot
     )
-
-    $projectRoot = Join-Path -Path $projectRoot -ChildPath "apps/dma-ukk"
+    
     $uiPath = Join-Path -Path $projectRoot -ChildPath "apps/dma-ukk/ui"
+    $projectRoot = Join-Path -Path $projectRoot -ChildPath "apps/dma-ukk"
 
     try {
         $envFilePath = Join-Path -Path $projectRoot -ChildPath "dev-ops\stacks\.env.template"
