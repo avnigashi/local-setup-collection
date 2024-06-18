@@ -420,7 +420,7 @@ function DMA-Starten {
         docker network create web
 
         # Start the backend in a new PowerShell process
-        Start-Process powershell -ArgumentList "yarn dev:backend:start"
+        Start-Process powershell -ArgumentList "yarn run dev:backend:start"
 
         # Change directory to UI path and start the UI
         Set-Location -Path $uiPath
