@@ -42,8 +42,9 @@ function Show-Menu {
     Write-Host "4. Install npm"
     Write-Host "5. Install pnpm"
     Write-Host "6. Install Yarn"
-    Write-Host "7. Install Git and Configure SSH for GitHub"
-    Write-Host "8. Exit"
+    Write-Host "7. Install Git"
+    Write-Host "8. DMA klonen und einrichten"
+    Write-Host "9. Exit"
 }
 
 function Show-PHPVersions {
@@ -176,29 +177,6 @@ function Install-Git {
     }
 }
 
-# Configure SSH for GitHub
-function Configure-SSH-For-GitHub {
-    $sshDir = "$env:USERPROFILE\.ssh"
-    if (-Not (Test-Path $sshDir)) {
-        New-Item -ItemType Directory -Path $sshDir
-    }
-    $keyPath = "$sshDir\id_rsa"
-    if (Test-Path $keyPath) {
-        $overwrite = Read-Host "An existing SSH key pair was found. Do you want to overwrite it? (y/n)"
-        if ($overwrite -ne 'y') {
-            Write-Host "Exiting without creating a new SSH key pair."
-            return
-        }
-    }
-    $email = Read-Host "Enter your email address for the SSH key"
-    ssh-keygen -t rsa -b 4096 -C $email -f $keyPath -N ""
-    Start-Process -FilePath "powershell" -ArgumentList "Start-Process ssh-agent -Verb runAs"
-    Start-Process -FilePath "powershell" -ArgumentList "ssh-add $keyPath"
-    Write-Host "Your new SSH public key has been generated:"
-    Get-Content "$keyPath.pub"
-    Write-Host "Copy the above SSH key and add it to your GitHub account under Settings > SSH and GPG keys."
-}
-
 # Install Composer
 function Install-Composer {
     $url = "https://getcomposer.org/Composer-Setup.exe"
@@ -245,11 +223,87 @@ function Install-Yarn-Pnpm {
     }
 }
 
+# DMA klonen und einrichten
+function DMA-Klonen-und-Einrichten {
+    $repoUrl = "https://github.com/healexsystems/cds"
+    $branchName = "asz/dma-latest"
+    $targetDir = Read-Host "Enter the target directory (leave blank to use the current directory)"
+    
+    if (-not $targetDir) {
+        $targetDir = Get-Location
+    }
+
+    git clone --branch $branchName $repoUrl $targetDir
+    if ($?) {
+        Write-Host "Repository cloned successfully into $targetDir."
+        DMA-Env-Variablen-Setzen -projectRoot "$targetDir\apps\dma-ukk"
+    } else {
+        Write-Host "Failed to clone the repository."
+    }
+}
+
+# DMA environment variables setup
+function DMA-Env-Variablen-Setzen {
+    param (
+        [string]$projectRoot
+    )
+
+    $requiredTools = @("sed", "cp", "yarn", "docker", "php", "docker-compose")
+    foreach ($tool in $requiredTools) {
+        if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) {
+            Write-Host "$tool is not installed. Please install it before proceeding."
+            return
+        }
+    }
+
+    $phpVersion = php -v | Select-String -Pattern "PHP 7.3"
+    if (-not $phpVersion) {
+        Write-Host "PHP 7.3 is not installed. Please install it before proceeding."
+        return
+    }
+
+    cd "$projectRoot\dev-ops\stacks" -ErrorAction Stop
+
+    Copy-Item -Path ".env.template" -Destination ".env.dev"
+
+    (Get-Content ".env.dev") -replace '^OIDC_CLIENT_ID=dma_ukk', '#OIDC_CLIENT_ID=dma_ukk' |
+        Set-Content ".env.dev"
+    (Get-Content ".env.dev") -replace '^OIDC_CLIENT_SECRET=.*$', '#$&' |
+        Set-Content ".env.dev"
+    Add-Content ".env.dev" "`nOIDC_CLIENT_ID=cds_dev`nOIDC_CLIENT_SECRET=your_secret_here"
+
+    Copy-Item -Path ".env.dev" -Destination ".env.base"
+
+    cd "$projectRoot" -ErrorAction Stop
+    yarn install
+
+    cd "$projectRoot\dev-ops" -ErrorAction Stop
+    yarn dma:build
+    yarn docker:build:cds
+    yarn docker:build:dma
+
+    cd "$projectRoot" -ErrorAction Stop
+
+    docker network create web
+    yarn dev:backend:start
+
+    yarn dev:ui:install
+    yarn dev:ui:start
+
+    Write-Host "Open the application at http://localhost:8080/"
+
+    Write-Host "If you see 'Einrichten', please enter the following:"
+    Write-Host "Username: (e.g. admin)"
+    Write-Host "Password: (e.g. NOT admin)"
+    Write-Host "Email: your email"
+    Write-Host "Setup-Token: value from APP_SETUP_TOKEN in .env.dev (could be '1')"
+}
+
 # Main menu logic
 while ($true) {
     Set-ExecutionPolicy-RemoteSigned
     Show-Menu
-    $choice = Read-Host "Enter your choice (1-8)"
+    $choice = Read-Host "Enter your choice (1-9)"
     switch ($choice) {
         1 {
             Show-PHPVersions
@@ -279,9 +333,11 @@ while ($true) {
         }
         7 {
             Install-Git
-            Configure-SSH-For-GitHub
         }
         8 {
+            DMA-Klonen-und-Einrichten
+        }
+        9 {
             break
         }
         default {
