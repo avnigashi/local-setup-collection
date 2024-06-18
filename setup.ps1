@@ -427,7 +427,7 @@ function DMA-Starten {
         Start-Process powershell -ArgumentList "yarn install"
 
        
-        Start-Process powershell -ArgumentList "yarn dev:ui:start"
+        Start-Process powershell -ArgumentList "yarn dev"
 
         Write-Host "Open the application at http://localhost:8080/"
 
