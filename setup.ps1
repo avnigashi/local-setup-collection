@@ -284,7 +284,7 @@ function DMA-Env-Variablen-Setzen {
         [string]$projectRoot
     )
 
-    $requiredTools = @("sed", "cp", "yarn", "docker", "php", "docker-compose")
+    $requiredTools = @("yarn", "docker", "php", "docker-compose")
     foreach ($tool in $requiredTools) {
         if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) {
             Write-Host "$tool is not installed. Please install it before proceeding."
@@ -340,6 +340,7 @@ function DMA-Env-Variablen-Setzen {
         Write-Host "Setup-Token: value from APP_SETUP_TOKEN in .env.dev (could be '1')"
     } catch {
         Write-Host "Error setting environment variables: $_"
+        Pause
     }
 }
 
