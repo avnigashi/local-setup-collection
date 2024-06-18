@@ -1,7 +1,3 @@
-# Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
-# Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted -Force
-# Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass -Force
-# Check and Set Execution Policy
 function Set-ExecutionPolicy-RemoteSigned {
     $currentPolicy = Get-ExecutionPolicy -Scope CurrentUser
     if ($currentPolicy -ne 'RemoteSigned') {
@@ -11,49 +7,20 @@ function Set-ExecutionPolicy-RemoteSigned {
         Write-Host "Execution policy is already set to RemoteSigned."
     }
 }
-
-# Check PowerShell version
 if ($PSVersionTable.PSVersion.Major -lt 5) {
     Write-Host "You'll need at least PowerShell version 5. To determine your version, open PowerShell and type:"
     Write-Host "$PSVersionTable.PSVersion.ToString()"
     Write-Host "If you have an older version, you can upgrade it following these instructions: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell"
     exit
 }
-
-# Determine OS architecture
 $is64Bit = [Environment]::Is64BitOperatingSystem
-
-# Define the PHP versions and URLs
 $phpVersions = @{
     "7.4.33" = if ($is64Bit) { "https://windows.php.net/downloads/releases/php-7.4.33-Win32-vc15-x64.zip" } else { "https://windows.php.net/downloads/releases/php-7.4.33-Win32-vc15-x86.zip" }
-    "8.0.30" = if ($is64Bit) { "https://windows.php.net/downloads/releases/php-8.0.30-Win32-vs16-x64.zip" } else { "https://windows.php.net/downloads/releases/php-8.0.30-Win32-vs16-x86.zip" }
-    "8.1.29" = if ($is64Bit) { "https://windows.php.net/downloads/releases/php-8.1.29-Win32-vs16-x64.zip" } else { "https://windows.php.net/downloads/releases/php-8.1.29-Win32-vs16-x86.zip" }
-    "8.2.20" = if ($is64Bit) { "https://windows.php.net/downloads/releases/php-8.2.20-Win32-vs16-x64.zip" } else { "https://windows.php.net/downloads/releases/php-8.2.20-Win32-vs16-x86.zip" }
     "8.3.8"  = if ($is64Bit) { "https://windows.php.net/downloads/releases/php-8.3.8-Win32-vs16-x64.zip" } else { "https://windows.php.net/downloads/releases/php-8.3.8-Win32-vs16-x86.zip" }
 }
 
-# Display menu with pixel art
 function Show-Menu {
     cls
-    Write-Host "    __  ________  ___   _"
-    Write-Host "   /  |/  /  _/ |/ / | / /"
-    Write-Host "  / /|_/ // //    /  |/ / "
-    Write-Host " /_/  /_/___/_/|_/|___/  "
-    Write-Host " Magic installer"
-    Write-Host "           .'\   /`."
-    Write-Host "         .'.-.`-'.-.`."
-    Write-Host "    ..._:   .-. .-.   :_..."
-    Write-Host "  .'    '-.(o ) (o ).-'    `."
-    Write-Host " :  _    _ _`~(_)~`_ _    _  :"
-    Write-Host ":  /:   ' .-=_   _=-. `   ;\  :"
-    Write-Host ":   :|-.._  '     `  _..-|:   :"
-    Write-Host " :   `:| |`:-:-.-:-:'| |:'   :"
-    Write-Host "  `.   `.| | | | | | |.'   .'"
-    Write-Host "    `.   `-:_| | |_:-'   .'"
-    Write-Host "      `-._   ````    _.-'"
-    Write-Host " "
-    Write-Host " Created by avnigashi"
-    Write-Host " "
     Write-Host "Select an option to install:"
     Write-Host "1. Install PHP"
     Write-Host "2. Install Composer"
@@ -63,11 +30,18 @@ function Show-Menu {
     Write-Host "6. Install Yarn"
     Write-Host "7. Install Git"
     Write-Host "8. Install Docker"
-    Write-Host "9. DMA klonen und einrichten"
+    Write-Host "9. Projekt Aufsetzen"
     Write-Host "10. Exit"
 }
 
-# Show progress bar
+function Show-ProjektAufsetzenMenu {
+    cls
+    Write-Host "Projekt Aufsetzen:"
+    Write-Host "1. DMA klonen und einrichten"
+    Write-Host "2. SF klonen und einrichten"
+    Write-Host "3. Zurück zum Hauptmenü"
+}
+
 function Show-ProgressBar {
     param (
         [string]$message,
@@ -84,7 +58,6 @@ function Show-ProgressBar {
     Write-Progress -Activity $message -Completed
 }
 
-# Show loading animation
 function Show-LoadingAnimation {
     param (
         [string]$message,
@@ -107,7 +80,6 @@ function Show-PHPVersions {
     Write-Host "Back to main menu (type 'menu')"
 }
 
-# Add to PATH
 function Add-ToPath {
     param (
         [string]$newPath
@@ -122,7 +94,6 @@ function Add-ToPath {
     $env:Path = "$newPath;$env:Path"
 }
 
-# Remove from PATH
 function Remove-FromPath {
     param (
         [string]$oldPath
@@ -134,7 +105,6 @@ function Remove-FromPath {
     $env:Path = $env:Path -replace [regex]::Escape($oldPath + ";"), ""
 }
 
-# Check if a command exists and get its version
 function Get-CommandVersion {
     param (
         [string]$command,
@@ -148,7 +118,6 @@ function Get-CommandVersion {
     }
 }
 
-# Install PHP
 function Install-PHP {
     param (
         [string]$phpVersion,
@@ -190,7 +159,6 @@ function Install-PHP {
     }
 }
 
-# Retry logic for Invoke-WebRequest
 function Invoke-WebRequest-Retry {
     param (
         [string]$url,
@@ -217,7 +185,6 @@ function Invoke-WebRequest-Retry {
     }
 }
 
-# Install Git
 function Install-Git {
     $url = if ($is64Bit) { "https://github.com/git-for-windows/git/releases/download/v2.45.2.windows.1/Git-2.45.2-64-bit.exe" } else { "https://github.com/git-for-windows/git/releases/download/v2.45.2.windows.1/Git-2.45.2-32-bit.exe" }
     $installerPath = "$env:TEMP\GitInstaller.exe"
@@ -232,7 +199,6 @@ function Install-Git {
     }
 }
 
-# Install Composer
 function Install-Composer {
     $url = "https://getcomposer.org/Composer-Setup.exe"
     $installerPath = "$env:TEMP\Composer-Setup.exe"
@@ -247,7 +213,6 @@ function Install-Composer {
     }
 }
 
-# Install nvm and Node.js
 function Install-Nvm-Node {
     $nvmInstallScript = "https://github.com/coreybutler/nvm-windows/releases/download/1.1.10/nvm-setup.exe"
     $installerPath = "$env:TEMP\nvm-setup.exe"
@@ -262,7 +227,6 @@ function Install-Nvm-Node {
     }
 }
 
-# Install Yarn or pnpm
 function Install-Yarn-Pnpm {
     param (
         [string]$choice
@@ -288,8 +252,6 @@ function Open-DockerDownloadPage {
     Write-Host "Docker download page has been opened in your browser."
 }
 
-
-# DMA klonen und einrichten
 function DMA-Klonen-und-Einrichten {
     while ($true) {
         cls
@@ -297,7 +259,7 @@ function DMA-Klonen-und-Einrichten {
         Write-Host "1. DMA klonen"
         Write-Host "2. DMA einrichten"
         Write-Host "3. DMA starten"
-        Write-Host "4. Zurück zum Hauptmenü"
+        Write-Host "4. Zurück zum Projekt Aufsetzen Menü"
         $subChoice = Read-Host "Enter your choice (1-4)"
         switch ($subChoice) {
             1 {
@@ -330,7 +292,46 @@ function DMA-Klonen-und-Einrichten {
     }
 }
 
-# DMA cloning
+function SF-Klonen-und-Einrichten {
+    while ($true) {
+        cls
+        Write-Host "SF klonen und einrichten:"
+        Write-Host "1. Projekt klonen"
+        Write-Host "2. Projekt einrichten"
+        Write-Host "3. SF Projekt starten"
+        Write-Host "4. Zurück zum Projekt Aufsetzen Menü"
+        $subChoice = Read-Host "Enter your choice (1-4)"
+        switch ($subChoice) {
+            1 {
+                SF-Klonen
+                Pause
+            }
+            2 {
+                $projectRoot = Read-Host "Enter the project root path (leave blank to use the current directory)"
+                if (-not $projectRoot) {
+                    $projectRoot = Get-Location
+                }
+                SF-Einrichten -projectRoot $projectRoot
+                Pause
+            }
+            3 {
+                $projectRoot = Read-Host "Enter the project root path (leave blank to use the current directory)"
+                if (-not $projectRoot) {
+                    $projectRoot = Get-Location
+                }
+                SF-Starten -projectRoot $projectRoot
+                Pause
+            }
+            4 {
+                return
+            }
+            default {
+                Write-Host "Invalid choice. Please try again."
+            }
+        }
+    }
+}
+
 function DMA-Klonen {
     $repoUrl = "https://github.com/healexsystems/cds"
     $branchName = "asz/dma-latest"
@@ -354,7 +355,6 @@ function DMA-Klonen {
     }
 }
 
-# DMA environment variables setup
 function DMA-Einrichten {
     param (
         [string]$projectRoot
@@ -392,7 +392,6 @@ function DMA-Einrichten {
     }
 }
 
-# DMA start
 function DMA-Starten {
     param (
         [string]$projectRoot
@@ -425,7 +424,80 @@ function DMA-Starten {
     }
 }
 
-# Main menu logic
+function SF-Klonen {
+    $repoUrl = "https://github.com/healexsystems/cds"
+    $targetDir = Read-Host "Enter the target directory (leave blank to use the current directory)"
+    
+    if (-not $targetDir) {
+        $targetDir = (Get-Location).Path
+    }
+
+    Write-Host "Cloning repository from $repoUrl into $targetDir..."
+    Show-LoadingAnimation -message "Cloning repository" -durationSeconds 10
+    try {
+        git clone $repoUrl $targetDir
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Repository cloned successfully into $targetDir."
+        } else {
+            Write-Host "Failed to clone the repository."
+        }
+    } catch {
+        Write-Host "Error cloning repository: $_"
+    }
+}
+
+function SF-Einrichten {
+    param (
+        [string]$projectRoot
+    )
+
+    $backendPath = Join-Path -Path $projectRoot -ChildPath "apps/sf/backend"
+    $frontendPath = Join-Path -Path $projectRoot -ChildPath "apps/sf/frontend"
+
+    try {
+        Copy-Item -Path (Join-Path -Path $backendPath -ChildPath ".env.template") -Destination (Join-Path -Path $backendPath -ChildPath ".env")
+        Copy-Item -Path (Join-Path -Path $frontendPath -ChildPath ".env-template") -Destination (Join-Path -Path $frontendPath -ChildPath ".env")
+
+        Set-Location -Path $backendPath
+        pnpm exec docker:up:db
+        pnpm exec docker:up:build
+
+        Set-Location -Path $frontendPath
+        pnpm exec docker:up:build
+
+        Write-Host "SF environment setup completed successfully."
+    } catch {
+        Write-Host "Error setting environment variables: $_"
+        Pause
+    }
+}
+
+function SF-Starten {
+    param (
+        [string]$projectRoot
+    )
+
+    $backendPath = Join-Path -Path $projectRoot -ChildPath "apps/sf/backend"
+    $frontendPath = Join-Path -Path $projectRoot -ChildPath "apps/sf/frontend"
+
+    try {
+        Set-Location -Path $backendPath
+
+        docker network create web
+
+        # Start the backend in a new PowerShell process
+        Start-Process powershell -ArgumentList "pnpm dev:backend:start" -NoNewWindow
+
+        # Change directory to UI path and start the UI
+        Start-Process powershell -ArgumentList "pnpm dev:ui:start" -NoNewWindow
+
+        Write-Host "Open the application at http://localhost:8080/"
+    } catch {
+        Write-Host "Error starting SF: $_"
+        Pause
+    }
+}
+
 while ($true) {
     Set-ExecutionPolicy-RemoteSigned
     Show-Menu
@@ -473,7 +545,24 @@ while ($true) {
             Pause
         }
         9 {
-            DMA-Klonen-und-Einrichten
+            while ($true) {
+                Show-ProjektAufsetzenMenu
+                $subChoice = Read-Host "Enter your choice (1-3)"
+                switch ($subChoice) {
+                    1 {
+                        DMA-Klonen-und-Einrichten
+                    }
+                    2 {
+                        SF-Klonen-und-Einrichten
+                    }
+                    3 {
+                        break
+                    }
+                    default {
+                        Write-Host "Invalid choice. Please try again."
+                    }
+                }
+            }
         }
         10 {
             break
