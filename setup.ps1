@@ -194,6 +194,8 @@ function Install-Git {
     if ($?) {
         Write-Host "Git has been installed successfully."
         Add-ToPath -newPath "C:\Program Files\Git\bin"
+        git lfs install
+        Write-Host "Git LFS has been installed and activated."
     } else {
         Write-Host "Failed to install Git."
     }
