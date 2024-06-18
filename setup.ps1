@@ -52,7 +52,7 @@ function Show-Menu {
     Write-Host "    `.   `-:_| | |_:-'   .'"
     Write-Host "      `-._   ````    _.-'"
     Write-Host " "
-    Write-Host " Created by Avni Gashi"
+    Write-Host " Created by avnigashi"
     Write-Host " "
     Write-Host "Select an option to install:"
     Write-Host "1. Install PHP"
