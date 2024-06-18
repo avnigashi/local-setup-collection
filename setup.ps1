@@ -236,67 +236,9 @@ function DMA-Klonen-und-Einrichten {
     git clone --branch $branchName $repoUrl $targetDir
     if ($?) {
         Write-Host "Repository cloned successfully into $targetDir."
-        DMA-Env-Variablen-Setzen -projectRoot "$targetDir\apps\dma-ukk"
     } else {
         Write-Host "Failed to clone the repository."
     }
-}
-
-# DMA environment variables setup
-function DMA-Env-Variablen-Setzen {
-    param (
-        [string]$projectRoot
-    )
-
-    $requiredTools = @("sed", "cp", "yarn", "docker", "php", "docker-compose")
-    foreach ($tool in $requiredTools) {
-        if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) {
-            Write-Host "$tool is not installed. Please install it before proceeding."
-            return
-        }
-    }
-
-    $phpVersion = php -v | Select-String -Pattern "PHP 7.3"
-    if (-not $phpVersion) {
-        Write-Host "PHP 7.3 is not installed. Please install it before proceeding."
-        return
-    }
-
-    cd "$projectRoot\dev-ops\stacks" -ErrorAction Stop
-
-    Copy-Item -Path ".env.template" -Destination ".env.dev"
-
-    (Get-Content ".env.dev") -replace '^OIDC_CLIENT_ID=dma_ukk', '#OIDC_CLIENT_ID=dma_ukk' |
-        Set-Content ".env.dev"
-    (Get-Content ".env.dev") -replace '^OIDC_CLIENT_SECRET=.*$', '#$&' |
-        Set-Content ".env.dev"
-    Add-Content ".env.dev" "`nOIDC_CLIENT_ID=cds_dev`nOIDC_CLIENT_SECRET=your_secret_here"
-
-    Copy-Item -Path ".env.dev" -Destination ".env.base"
-
-    cd "$projectRoot" -ErrorAction Stop
-    yarn install
-
-    cd "$projectRoot\dev-ops" -ErrorAction Stop
-    yarn dma:build
-    yarn docker:build:cds
-    yarn docker:build:dma
-
-    cd "$projectRoot" -ErrorAction Stop
-
-    docker network create web
-    yarn dev:backend:start
-
-    yarn dev:ui:install
-    yarn dev:ui:start
-
-    Write-Host "Open the application at http://localhost:8080/"
-
-    Write-Host "If you see 'Einrichten', please enter the following:"
-    Write-Host "Username: (e.g. admin)"
-    Write-Host "Password: (e.g. NOT admin)"
-    Write-Host "Email: your email"
-    Write-Host "Setup-Token: value from APP_SETUP_TOKEN in .env.dev (could be '1')"
 }
 
 # Main menu logic
