@@ -73,12 +73,24 @@ function Add-ToPath {
     )
     $envPath = [System.Environment]::GetEnvironmentVariable('Path', 'Machine')
     if ($envPath -notmatch [regex]::Escape($newPath)) {
-        [System.Environment]::SetEnvironmentVariable('Path', "$envPath;$newPath", 'Machine')
+        [System.Environment]::SetEnvironmentVariable('Path', "$newPath;$envPath", 'Machine')
         Write-Host "$newPath has been added to the system PATH. Please restart your terminal or log out and log back in for the changes to take effect."
     } else {
         Write-Host "$newPath already exists in the system PATH."
     }
-    $env:Path = "$env:Path;$newPath"
+    $env:Path = "$newPath;$env:Path"
+}
+
+# Remove from PATH
+function Remove-FromPath {
+    param (
+        [string]$oldPath
+    )
+    $envPath = [System.Environment]::GetEnvironmentVariable('Path', 'Machine')
+    $envPath = $envPath -replace [regex]::Escape($oldPath + ";"), ""
+    [System.Environment]::SetEnvironmentVariable('Path', $envPath, 'Machine')
+    Write-Host "$oldPath has been removed from the system PATH."
+    $env:Path = $env:Path -replace [regex]::Escape($oldPath + ";"), ""
 }
 
 # Check if a command exists and get its version
@@ -108,6 +120,9 @@ function Install-PHP {
         if ($confirm -ne 'y') {
             return
         }
+        # Remove the current PHP path from PATH
+        $phpPath = (Get-Command "php").Path | Split-Path
+        Remove-FromPath -oldPath $phpPath
     }
 
     $installPath = "C:\Program Files\PHP\php-$phpVersion"
