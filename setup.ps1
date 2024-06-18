@@ -135,11 +135,38 @@ function Install-PHP {
     }
 }
 
+# Retry logic for Invoke-WebRequest
+function Invoke-WebRequest-Retry {
+    param (
+        [string]$url,
+        [string]$outputPath,
+        [int]$maxRetries = 3,
+        [int]$delaySeconds = 5
+    )
+    $attempt = 0
+    $success = $false
+    while (-not $success -and $attempt -lt $maxRetries) {
+        try {
+            Invoke-WebRequest -Uri $url -OutFile $outputPath -ErrorAction Stop
+            $success = $true
+        } catch {
+            $attempt++
+            if ($attempt -lt $maxRetries) {
+                Write-Host "Attempt $attempt failed. Retrying in $delaySeconds seconds..."
+                Start-Sleep -Seconds $delaySeconds
+            } else {
+                Write-Host "Attempt $attempt failed. No more retries left."
+                throw $_
+            }
+        }
+    }
+}
+
 # Install Git
 function Install-Git {
     $url = "https://github.com/git-for-windows/git/releases/latest/download/Git-2.36.1.1-64-bit.exe"
     $installerPath = "$env:TEMP\GitInstaller.exe"
-    Invoke-WebRequest -Uri $url -OutFile $installerPath
+    Invoke-WebRequest-Retry -url $url -outputPath $installerPath
     Start-Process -FilePath $installerPath -ArgumentList "/VERYSILENT" -Wait
     if ($?) {
         Write-Host "Git has been installed successfully."
@@ -190,7 +217,7 @@ function Install-Composer {
 function Install-Nvm-Node {
     $nvmInstallScript = "https://github.com/coreybutler/nvm-windows/releases/download/1.1.10/nvm-setup.exe"
     $installerPath = "$env:TEMP\nvm-setup.exe"
-    Invoke-WebRequest -Uri $nvmInstallScript -OutFile $installerPath
+    Invoke-WebRequest-Retry -url $nvmInstallScript -outputPath $installerPath
     Start-Process -FilePath $installerPath -Wait
     if ($?) {
         Write-Host "nvm has been installed successfully."
