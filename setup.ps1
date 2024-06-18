@@ -284,14 +284,7 @@ function DMA-Env-Variablen-Setzen {
         [string]$projectRoot
     )
 
-    $requiredTools = @("yarn", "docker", "php", "docker-compose")
-    foreach ($tool in $requiredTools) {
-        if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) {
-            Write-Host "$tool is not installed. Please install it before proceeding."
-            Pause
-            return
-        }
-    }
+    
 
     
 
