@@ -363,6 +363,7 @@ function DMA-Einrichten {
     )
 
     $projectRoot = Join-Path -Path $projectRoot -ChildPath "apps/dma-ukk"
+    $uiPath = Join-Path -Path $projectRoot -ChildPath "apps/dma-ukk/ui"
 
     try {
         $envFilePath = Join-Path -Path $projectRoot -ChildPath "dev-ops\stacks\.env.template"
@@ -382,6 +383,10 @@ function DMA-Einrichten {
         Set-Location -Path $projectRoot
         yarn install
 
+        Set-Location -Path $uiPath
+        yarn install
+
+        Set-Location -Path $projectRoot
         Set-Location -Path (Join-Path -Path $projectRoot -ChildPath "dev-ops")
         yarn dma:build
         yarn docker:build:cds
@@ -408,12 +413,12 @@ function DMA-Starten {
         docker network create web
 
         # Start the backend in a new PowerShell process
-        Start-Process powershell -ArgumentList "yarn dev:backend:start" -NoNewWindow
+        Start-Process powershell -ArgumentList "yarn dev:backend:start"
 
         # Change directory to UI path and start the UI
         Set-Location -Path $uiPath
         yarn install
-        Start-Process powershell -ArgumentList "yarn dev:ui:start" -NoNewWindow
+        Start-Process powershell -ArgumentList "yarn dev:ui:start"
 
         Write-Host "Open the application at http://localhost:8080/"
 
