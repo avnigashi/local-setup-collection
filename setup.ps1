@@ -235,6 +235,7 @@ function DMA-Klonen-und-Einrichten {
         switch ($subChoice) {
             1 {
                 DMA-Klonen
+                Pause
             }
             2 {
                 $projectRoot = Read-Host "Enter the project root path (leave blank to use the current directory)"
@@ -242,6 +243,7 @@ function DMA-Klonen-und-Einrichten {
                     $projectRoot = Get-Location
                 }
                 DMA-Env-Variablen-Setzen -projectRoot $projectRoot
+                Pause
             }
             3 {
                 return
@@ -264,11 +266,15 @@ function DMA-Klonen {
     }
 
     Write-Host "Cloning repository from $repoUrl into $targetDir..."
-    git clone --branch $branchName $repoUrl $targetDir
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "Repository cloned successfully into $targetDir."
-    } else {
-        Write-Host "Failed to clone the repository."
+    try {
+        git clone --branch $branchName $repoUrl $targetDir
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Repository cloned successfully into $targetDir."
+        } else {
+            Write-Host "Failed to clone the repository."
+        }
+    } catch {
+        Write-Host "Error cloning repository: $_"
     }
 }
 
@@ -282,6 +288,7 @@ function DMA-Env-Variablen-Setzen {
     foreach ($tool in $requiredTools) {
         if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) {
             Write-Host "$tool is not installed. Please install it before proceeding."
+            Pause
             return
         }
     }
@@ -289,46 +296,51 @@ function DMA-Env-Variablen-Setzen {
     $phpVersion = php -v | Select-String -Pattern "PHP 7.3"
     if (-not $phpVersion) {
         Write-Host "PHP 7.3 is not installed. Please install it before proceeding."
+        Pause
         return
     }
 
-    $envFilePath = Join-Path -Path $projectRoot -ChildPath "dev-ops\stacks\.env.template"
-    $envDevFilePath = Join-Path -Path $projectRoot -ChildPath "dev-ops\stacks\.env.dev"
-    $envBaseFilePath = Join-Path -Path $projectRoot -ChildPath "dev-ops\stacks\.env.base"
+    try {
+        $envFilePath = Join-Path -Path $projectRoot -ChildPath "dev-ops\stacks\.env.template"
+        $envDevFilePath = Join-Path -Path $projectRoot -ChildPath "dev-ops\stacks\.env.dev"
+        $envBaseFilePath = Join-Path -Path $projectRoot -ChildPath "dev-ops\stacks\.env.base"
 
-    Copy-Item -Path $envFilePath -Destination $envDevFilePath
+        Copy-Item -Path $envFilePath -Destination $envDevFilePath
 
-    (Get-Content $envDevFilePath) -replace '^OIDC_CLIENT_ID=dma_ukk', '#OIDC_CLIENT_ID=dma_ukk' |
-        Set-Content $envDevFilePath
-    (Get-Content $envDevFilePath) -replace '^OIDC_CLIENT_SECRET=.*$', '#$&' |
-        Set-Content $envDevFilePath
-    Add-Content $envDevFilePath "`nOIDC_CLIENT_ID=cds_dev`nOIDC_CLIENT_SECRET=your_secret_here"
+        (Get-Content $envDevFilePath) -replace '^OIDC_CLIENT_ID=dma_ukk', '#OIDC_CLIENT_ID=dma_ukk' |
+            Set-Content $envDevFilePath
+        (Get-Content $envDevFilePath) -replace '^OIDC_CLIENT_SECRET=.*$', '#$&' |
+            Set-Content $envDevFilePath
+        Add-Content $envDevFilePath "`nOIDC_CLIENT_ID=cds_dev`nOIDC_CLIENT_SECRET=your_secret_here"
 
-    Copy-Item -Path $envDevFilePath -Destination $envBaseFilePath
+        Copy-Item -Path $envDevFilePath -Destination $envBaseFilePath
 
-    Set-Location -Path $projectRoot
-    yarn install
+        Set-Location -Path $projectRoot
+        yarn install
 
-    Set-Location -Path (Join-Path -Path $projectRoot -ChildPath "dev-ops")
-    yarn dma:build
-    yarn docker:build:cds
-    yarn docker:build:dma
+        Set-Location -Path (Join-Path -Path $projectRoot -ChildPath "dev-ops")
+        yarn dma:build
+        yarn docker:build:cds
+        yarn docker:build:dma
 
-    Set-Location -Path $projectRoot
+        Set-Location -Path $projectRoot
 
-    docker network create web
-    yarn dev:backend:start
+        docker network create web
+        yarn dev:backend:start
 
-    yarn dev:ui:install
-    yarn dev:ui:start
+        yarn dev:ui:install
+        yarn dev:ui:start
 
-    Write-Host "Open the application at http://localhost:8080/"
+        Write-Host "Open the application at http://localhost:8080/"
 
-    Write-Host "If you see 'Einrichten', please enter the following:"
-    Write-Host "Username: (e.g. admin)"
-    Write-Host "Password: (e.g. NOT admin)"
-    Write-Host "Email: your email"
-    Write-Host "Setup-Token: value from APP_SETUP_TOKEN in .env.dev (could be '1')"
+        Write-Host "If you see 'Einrichten', please enter the following:"
+        Write-Host "Username: (e.g. admin)"
+        Write-Host "Password: (e.g. NOT admin)"
+        Write-Host "Email: your email"
+        Write-Host "Setup-Token: value from APP_SETUP_TOKEN in .env.dev (could be '1')"
+    } catch {
+        Write-Host "Error setting environment variables: $_"
+    }
 }
 
 # Main menu logic
@@ -343,28 +355,36 @@ while ($true) {
             if ($phpChoice -eq 'menu') { continue }
             if ($phpVersions.ContainsKey($phpChoice)) {
                 Install-PHP -phpVersion $phpChoice -phpUrl $phpVersions[$phpChoice]
+                Pause
             } else {
                 Write-Host "Invalid choice. Please try again."
+                Pause
             }
         }
         2 {
             Install-Composer
+            Pause
         }
         3 {
             Install-Nvm-Node
+            Pause
         }
         4 {
             npm install -g npm
             Write-Host "npm has been installed successfully."
+            Pause
         }
         5 {
             Install-Yarn-Pnpm -choice 'pnpm'
+            Pause
         }
         6 {
             Install-Yarn-Pnpm -choice 'yarn'
+            Pause
         }
         7 {
             Install-Git
+            Pause
         }
         8 {
             DMA-Klonen-und-Einrichten
@@ -374,6 +394,7 @@ while ($true) {
         }
         default {
             Write-Host "Invalid choice. Please try again."
+            Pause
         }
     }
 }
