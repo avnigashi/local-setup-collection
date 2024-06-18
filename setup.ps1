@@ -32,9 +32,28 @@ $phpVersions = @{
     "8.3.8"  = if ($is64Bit) { "https://windows.php.net/downloads/releases/php-8.3.8-Win32-vs16-x64.zip" } else { "https://windows.php.net/downloads/releases/php-8.3.8-Win32-vs16-x86.zip" }
 }
 
-# Display menu
+# Display menu with pixel art
 function Show-Menu {
     cls
+    Write-Host "    __  ________  ___   _"
+    Write-Host "   /  |/  /  _/ |/ / | / /"
+    Write-Host "  / /|_/ // //    /  |/ / "
+    Write-Host " /_/  /_/___/_/|_/|___/  "
+    Write-Host " Magic installer"
+    Write-Host "           .'\   /`."
+    Write-Host "         .'.-.`-'.-.`."
+    Write-Host "    ..._:   .-. .-.   :_..."
+    Write-Host "  .'    '-.(o ) (o ).-'    `."
+    Write-Host " :  _    _ _`~(_)~`_ _    _  :"
+    Write-Host ":  /:   ' .-=_   _=-. `   ;\  :"
+    Write-Host ":   :|-.._  '     `  _..-|:   :"
+    Write-Host " :   `:| |`:-:-.-:-:'| |:'   :"
+    Write-Host "  `.   `.| | | | | | |.'   .'"
+    Write-Host "    `.   `-:_| | |_:-'   .'"
+    Write-Host "      `-._   ````    _.-'"
+    Write-Host " "
+    Write-Host " Created by Avni Gashi"
+    Write-Host " "
     Write-Host "Select an option to install:"
     Write-Host "1. Install PHP"
     Write-Host "2. Install Composer"
@@ -46,6 +65,40 @@ function Show-Menu {
     Write-Host "8. Install Docker"
     Write-Host "9. DMA klonen und einrichten"
     Write-Host "10. Exit"
+}
+
+# Show progress bar
+function Show-ProgressBar {
+    param (
+        [string]$message,
+        [int]$delaySeconds = 10
+    )
+    $progress = 0
+    $increment = 100 / $delaySeconds
+    Write-Host $message
+    for ($i = 0; $i -lt $delaySeconds; $i++) {
+        Write-Progress -Activity $message -PercentComplete $progress
+        Start-Sleep -Seconds 1
+        $progress += $increment
+    }
+    Write-Progress -Activity $message -Completed
+}
+
+# Show loading animation
+function Show-LoadingAnimation {
+    param (
+        [string]$message,
+        [int]$durationSeconds = 10
+    )
+    $animation = ("|", "/", "-", "\")
+    $i = 0
+    $end = [DateTime]::Now.AddSeconds($durationSeconds)
+    while ([DateTime]::Now -lt $end) {
+        Write-Host -NoNewline "`r$message $($animation[$i % $animation.Length])"
+        Start-Sleep -Milliseconds 200
+        $i++
+    }
+    Write-Host "`r$message done."
 }
 
 function Show-PHPVersions {
@@ -169,6 +222,7 @@ function Install-Git {
     $url = if ($is64Bit) { "https://github.com/git-for-windows/git/releases/download/v2.45.2.windows.1/Git-2.45.2-64-bit.exe" } else { "https://github.com/git-for-windows/git/releases/download/v2.45.2.windows.1/Git-2.45.2-32-bit.exe" }
     $installerPath = "$env:TEMP\GitInstaller.exe"
     Invoke-WebRequest-Retry -url $url -outputPath $installerPath
+    Show-LoadingAnimation -message "Downloading Git" -durationSeconds 5
     Start-Process -FilePath $installerPath -ArgumentList "/VERYSILENT" -Wait
     if ($?) {
         Write-Host "Git has been installed successfully."
@@ -183,6 +237,7 @@ function Install-Composer {
     $url = "https://getcomposer.org/Composer-Setup.exe"
     $installerPath = "$env:TEMP\Composer-Setup.exe"
     Invoke-WebRequest -Uri $url -OutFile $installerPath
+    Show-ProgressBar -message "Downloading Composer" -delaySeconds 5
     Start-Process -FilePath $installerPath -ArgumentList "/VERYSILENT" -Wait
     if ($?) {
         Write-Host "Composer has been installed successfully."
@@ -197,6 +252,7 @@ function Install-Nvm-Node {
     $nvmInstallScript = "https://github.com/coreybutler/nvm-windows/releases/download/1.1.10/nvm-setup.exe"
     $installerPath = "$env:TEMP\nvm-setup.exe"
     Invoke-WebRequest-Retry -url $nvmInstallScript -outputPath $installerPath
+    Show-LoadingAnimation -message "Downloading nvm" -durationSeconds 5
     Start-Process -FilePath $installerPath -Wait
     if ($?) {
         Write-Host "nvm has been installed successfully."
@@ -213,10 +269,12 @@ function Install-Yarn-Pnpm {
     )
     if ($choice -eq 'yarn') {
         npm install -g yarn
+        Show-ProgressBar -message "Installing Yarn" -delaySeconds 5
         Write-Host "Yarn has been installed successfully."
         Add-ToPath -newPath "$env:APPDATA\npm\node_modules\yarn\bin"
     } elseif ($choice -eq 'pnpm') {
         npm install -g pnpm
+        Show-ProgressBar -message "Installing pnpm" -delaySeconds 5
         Write-Host "pnpm has been installed successfully."
         Add-ToPath -newPath "$env:APPDATA\npm\node_modules\pnpm\bin"
     } else {
@@ -229,6 +287,7 @@ function Install-Docker {
     $url = "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
     $installerPath = "$env:TEMP\DockerInstaller.exe"
     Invoke-WebRequest-Retry -url $url -outputPath $installerPath
+    Show-LoadingAnimation -message "Downloading Docker" -durationSeconds 10
     Start-Process -FilePath $installerPath -ArgumentList "/quiet" -Wait
     if ($?) {
         Write-Host "Docker has been installed successfully."
@@ -290,6 +349,7 @@ function DMA-Klonen {
     }
 
     Write-Host "Cloning repository from $repoUrl into $targetDir..."
+    Show-LoadingAnimation -message "Cloning repository" -durationSeconds 10
     try {
         git clone --branch $branchName $repoUrl $targetDir
         if ($LASTEXITCODE -eq 0) {
@@ -359,9 +419,6 @@ function DMA-Starten {
 
         # Change directory to UI path and start the UI
         Start-Process powershell -ArgumentList "yarn dev:ui:start" -NoNewWindow
-
-        
-        
 
         Write-Host "Open the application at http://localhost:8080/"
 
