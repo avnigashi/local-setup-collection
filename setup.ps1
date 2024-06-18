@@ -225,20 +225,110 @@ function Install-Yarn-Pnpm {
 
 # DMA klonen und einrichten
 function DMA-Klonen-und-Einrichten {
+    while ($true) {
+        cls
+        Write-Host "DMA klonen und einrichten:"
+        Write-Host "1. DMA klonen"
+        Write-Host "2. DMA env. variablen setzen"
+        Write-Host "3. Zurück zum Hauptmenü"
+        $subChoice = Read-Host "Enter your choice (1-3)"
+        switch ($subChoice) {
+            1 {
+                DMA-Klonen
+            }
+            2 {
+                $projectRoot = Read-Host "Enter the project root path (leave blank to use the current directory)"
+                if (-not $projectRoot) {
+                    $projectRoot = Get-Location
+                }
+                DMA-Env-Variablen-Setzen -projectRoot $projectRoot
+            }
+            3 {
+                return
+            }
+            default {
+                Write-Host "Invalid choice. Please try again."
+            }
+        }
+    }
+}
+
+# DMA cloning
+function DMA-Klonen {
     $repoUrl = "https://github.com/healexsystems/cds"
     $branchName = "asz/dma-latest"
     $targetDir = Read-Host "Enter the target directory (leave blank to use the current directory)"
     
     if (-not $targetDir) {
-        $targetDir = Get-Location
+        $targetDir = (Get-Location).Path
     }
 
+    Write-Host "Cloning repository from $repoUrl into $targetDir..."
     git clone --branch $branchName $repoUrl $targetDir
-    if ($?) {
+    if ($LASTEXITCODE -eq 0) {
         Write-Host "Repository cloned successfully into $targetDir."
     } else {
         Write-Host "Failed to clone the repository."
     }
+}
+
+# DMA environment variables setup
+function DMA-Env-Variablen-Setzen {
+    param (
+        [string]$projectRoot
+    )
+
+    $requiredTools = @("sed", "cp", "yarn", "docker", "php", "docker-compose")
+    foreach ($tool in $requiredTools) {
+        if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) {
+            Write-Host "$tool is not installed. Please install it before proceeding."
+            return
+        }
+    }
+
+    $phpVersion = php -v | Select-String -Pattern "PHP 7.3"
+    if (-not $phpVersion) {
+        Write-Host "PHP 7.3 is not installed. Please install it before proceeding."
+        return
+    }
+
+    $envFilePath = Join-Path -Path $projectRoot -ChildPath "dev-ops\stacks\.env.template"
+    $envDevFilePath = Join-Path -Path $projectRoot -ChildPath "dev-ops\stacks\.env.dev"
+    $envBaseFilePath = Join-Path -Path $projectRoot -ChildPath "dev-ops\stacks\.env.base"
+
+    Copy-Item -Path $envFilePath -Destination $envDevFilePath
+
+    (Get-Content $envDevFilePath) -replace '^OIDC_CLIENT_ID=dma_ukk', '#OIDC_CLIENT_ID=dma_ukk' |
+        Set-Content $envDevFilePath
+    (Get-Content $envDevFilePath) -replace '^OIDC_CLIENT_SECRET=.*$', '#$&' |
+        Set-Content $envDevFilePath
+    Add-Content $envDevFilePath "`nOIDC_CLIENT_ID=cds_dev`nOIDC_CLIENT_SECRET=your_secret_here"
+
+    Copy-Item -Path $envDevFilePath -Destination $envBaseFilePath
+
+    Set-Location -Path $projectRoot
+    yarn install
+
+    Set-Location -Path (Join-Path -Path $projectRoot -ChildPath "dev-ops")
+    yarn dma:build
+    yarn docker:build:cds
+    yarn docker:build:dma
+
+    Set-Location -Path $projectRoot
+
+    docker network create web
+    yarn dev:backend:start
+
+    yarn dev:ui:install
+    yarn dev:ui:start
+
+    Write-Host "Open the application at http://localhost:8080/"
+
+    Write-Host "If you see 'Einrichten', please enter the following:"
+    Write-Host "Username: (e.g. admin)"
+    Write-Host "Password: (e.g. NOT admin)"
+    Write-Host "Email: your email"
+    Write-Host "Setup-Token: value from APP_SETUP_TOKEN in .env.dev (could be '1')"
 }
 
 # Main menu logic
