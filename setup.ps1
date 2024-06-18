@@ -225,36 +225,6 @@ function Install-Yarn-Pnpm {
 
 # DMA klonen und einrichten
 function DMA-Klonen-und-Einrichten {
-    while ($true) {
-        cls
-        Write-Host "DMA klonen und einrichten:"
-        Write-Host "1. DMA klonen"
-        Write-Host "2. DMA env. variablen setzen"
-        Write-Host "3. Zurück zum Hauptmenü"
-        $subChoice = Read-Host "Enter your choice (1-3)"
-        switch ($subChoice) {
-            1 {
-                DMA-Klonen
-            }
-            2 {
-                $projectRoot = Read-Host "Enter the project root path (leave blank to use the current directory)"
-                if (-not $projectRoot) {
-                    $projectRoot = Get-Location
-                }
-                DMA-Env-Variablen-Setzen -projectRoot "$projectRoot\apps\dma-ukk"
-            }
-            3 {
-                return
-            }
-            default {
-                Write-Host "Invalid choice. Please try again."
-            }
-        }
-    }
-}
-
-# DMA cloning
-function DMA-Klonen {
     $repoUrl = "https://github.com/healexsystems/cds"
     $branchName = "asz/dma-latest"
     $targetDir = Read-Host "Enter the target directory (leave blank to use the current directory)"
@@ -263,10 +233,10 @@ function DMA-Klonen {
         $targetDir = Get-Location
     }
 
-    Write-Host "Cloning repository from $repoUrl into $targetDir..."
-    Start-Process -FilePath "git" -ArgumentList "clone --branch $branchName $repoUrl $targetDir" -Wait
+    git clone --branch $branchName $repoUrl $targetDir
     if ($?) {
         Write-Host "Repository cloned successfully into $targetDir."
+        DMA-Env-Variablen-Setzen -projectRoot "$targetDir\apps\dma-ukk"
     } else {
         Write-Host "Failed to clone the repository."
     }
