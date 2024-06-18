@@ -40,9 +40,28 @@ The Windows setup script performs the following tasks:
     ```
     
 ### Windows Setup Script
-1. Save the script as `setup.local.windows.py`.
-2. Run the script:
-    ```bash
-    ./setup.local.windows.py
-    ```
-irm https://raw.githubusercontent.com/avnigashi/local-setup-collection/main/setup.ps1 | iex
+#### Prerequisites
+- PowerShell installed.
+- Administrator privileges.
+
+#### Steps
+
+1. **Open PowerShell as Administrator**:
+   - Search for "PowerShell" in the Start menu, right-click, and select "Run as administrator."
+
+2. **Set Execution Policy**:
+   - Run:
+     ```powershell
+     Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+     ```
+
+3. **Execute the Script**:
+   - Run:
+     ```powershell
+     irm https://raw.githubusercontent.com/avnigashi/local-setup-collection/main/setup.ps1 | iex
+     ```
+
+4. **Follow the Prompts**:
+   - Select and install the desired components from the menu.
+
+This will automate the setup process for various developer tools.
