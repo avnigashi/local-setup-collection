@@ -293,12 +293,7 @@ function DMA-Env-Variablen-Setzen {
         }
     }
 
-    $phpVersion = php -v | Select-String -Pattern "PHP 7.4"
-    if (-not $phpVersion) {
-        Write-Host "PHP 7.4 is not installed. Please install it before proceeding."
-        Pause
-        return
-    }
+    
 
     try {
         $envFilePath = Join-Path -Path $projectRoot -ChildPath "dev-ops\stacks\.env.template"
