@@ -461,8 +461,18 @@ function SF-Einrichten {
         Copy-Item -Path (Join-Path -Path $frontendPath -ChildPath ".env-template") -Destination (Join-Path -Path $frontendPath -ChildPath ".env")
 
         Set-Location -Path $backendPath
-        pnpm exec docker:up:db
-        pnpm exec docker:up:build
+        if ((Get-CommandVersion -command "node" -versionArg "--version").Split('.')[0] -lt 18) {
+            Write-Host "Updating Node.js to version 18.12.0 or later..."
+            nvm install 18.12.0
+            nvm use 18.12.0
+        }
+        Start-Process powershell -ArgumentList " pnpm i" -NoNewWindow
+
+        Start-Process powershell -ArgumentList " pnpm run docker:up:db" -NoNewWindow
+        Start-Process powershell -ArgumentList " pnpm exec docker:up:build" -NoNewWindow
+
+       
+        
 
         Set-Location -Path $frontendPath
         pnpm exec docker:up:build
