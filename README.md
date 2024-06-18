@@ -53,6 +53,8 @@ The Windows setup script performs the following tasks:
    - Run:
      ```powershell
      Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+     Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted -Force
+     Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass -Force
      ```
 
 3. **Execute the Script**:
