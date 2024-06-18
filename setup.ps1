@@ -346,17 +346,19 @@ function DMA-Starten {
         [string]$projectRoot
     )
 
-    $projectRoot = Join-Path -Path $projectRoot -ChildPath "apps/dma-ukk"
+    $backendPath = Join-Path -Path $projectRoot -ChildPath "apps/dma-ukk"
+    $uiPath = Join-Path -Path $projectRoot -ChildPath "cds\apps\dma-ukk\ui"
 
     try {
-        Set-Location -Path $projectRoot
+        Set-Location -Path $backendPath
 
         docker network create web
 
         # Start the backend in a new PowerShell process
         Start-Process powershell -ArgumentList "yarn dev:backend:start" -NoNewWindow
 
-        # Start the UI
+        # Change directory to UI path and start the UI
+        Set-Location -Path $uiPath
         yarn dev:ui:install
         yarn dev:ui:start
 
