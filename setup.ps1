@@ -476,6 +476,9 @@ function SF-Einrichten {
 
         Set-Location -Path $frontendPath
         pnpm exec docker:up:build
+        Start-Process powershell -ArgumentList " pnpm i" -NoNewWindow
+
+        Start-Process powershell -ArgumentList " pnpm exec docker:up:build" -NoNewWindow
 
         Write-Host "SF environment setup completed successfully."
     } catch {
