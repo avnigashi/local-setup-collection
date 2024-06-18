@@ -383,9 +383,10 @@ function DMA-Einrichten {
         yarn install
 
         Set-Location -Path (Join-Path -Path $projectRoot -ChildPath "dev-ops")
-        yarn dma:build
-        yarn docker:build:cds
+        Start-Process powershell -ArgumentList "yarn docker:build:cds" -NoNewWindow
+
         yarn docker:build:dma
+        
 
         Write-Host "DMA environment setup completed successfully."
     } catch {
