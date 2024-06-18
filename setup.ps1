@@ -382,7 +382,11 @@ function DMA-Einrichten {
         Set-Location -Path $projectRoot
         yarn install
 
-        
+        Set-Location -Path (Join-Path -Path $projectRoot -ChildPath "dev-ops")
+        yarn dma:build
+        yarn docker:build:cds
+        yarn docker:build:dma
+
         Write-Host "DMA environment setup completed successfully."
     } catch {
         Write-Host "Error setting environment variables: $_"
@@ -396,6 +400,7 @@ function DMA-Starten {
     )
 
     $backendPath = Join-Path -Path $projectRoot -ChildPath "apps/dma-ukk"
+    $uiPath = Join-Path -Path $projectRoot -ChildPath "apps/dma-ukk/ui"
 
     try {
         Set-Location -Path $backendPath
@@ -403,10 +408,12 @@ function DMA-Starten {
         docker network create web
 
         # Start the backend in a new PowerShell process
-        Start-Process powershell -ArgumentList "yarn run dev:backend:start" -NoNewWindow
+        Start-Process powershell -ArgumentList "yarn dev:backend:start" -NoNewWindow
 
         # Change directory to UI path and start the UI
-        Start-Process powershell -ArgumentList "yarn run dev:ui:start" -NoNewWindow
+        Set-Location -Path $uiPath
+        yarn install
+        Start-Process powershell -ArgumentList "yarn dev:ui:start" -NoNewWindow
 
         Write-Host "Open the application at http://localhost:8080/"
 
