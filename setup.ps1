@@ -19,6 +19,21 @@ function Verify-PowerShellVersion {
 # Determine the system architecture
 $is64Bit = [Environment]::Is64BitOperatingSystem
 
+# Add to PATH
+function Add-ToPath {
+    param (
+        [string]$newPath
+    )
+    $envPath = [System.Environment]::GetEnvironmentVariable('Path', 'Machine')
+    if ($envPath -notmatch [regex]::Escape($newPath)) {
+        [System.Environment]::SetEnvironmentVariable('Path', "$envPath;$newPath", 'Machine')
+        Write-Host "$newPath has been added to the system PATH. Please restart your terminal or log out and log back in for the changes to take effect."
+    } else {
+        Write-Host "$newPath already exists in the system PATH."
+    }
+    $env:Path = "$env:Path;$newPath"
+}
+
 # Function to install PHP
 function Install-PHP {
     Param ([string]$Version)
@@ -37,6 +52,7 @@ function Install-PHP {
         Invoke-WebRequest -Uri $url -OutFile $output
         Expand-Archive -Path $output -DestinationPath "C:\PHP\$Version"
         Remove-Item $output
+        Add-ToPath -newPath "C:\PHP\$Version"
         Write-Host "PHP $Version installed at C:\PHP\$Version"
     } else {
         Write-Host "Invalid PHP version. Please choose a valid version."
@@ -49,6 +65,7 @@ function Install-Composer {
     Invoke-WebRequest -Uri "https://getcomposer.org/installer" -OutFile "composer-setup.php"
     & php "composer-setup.php" --install-dir=C:\PHP --filename=composer
     Remove-Item "composer-setup.php"
+    Add-ToPath -newPath "C:\PHP"
     Write-Host "Composer installed."
 }
 
@@ -61,6 +78,7 @@ function Install-Node {
     Invoke-WebRequest -Uri $url -OutFile $output
     Expand-Archive -Path $output -DestinationPath "C:\Nodejs\$Version"
     Remove-Item $output
+    Add-ToPath -newPath "C:\Nodejs\$Version"
     Write-Host "Node.js $Version installed at C:\Nodejs\$Version"
 }
 
@@ -72,6 +90,7 @@ function Install-Yarn {
     Invoke-WebRequest -Uri $url -OutFile "yarn.msi"
     Start-Process msiexec.exe -ArgumentList "/i yarn.msi /quiet" -Wait -NoNewWindow
     Remove-Item "yarn.msi"
+    Add-ToPath -newPath "$env:LOCALAPPDATA\Yarn\bin"
     Write-Host "Yarn $Version installed."
 }
 
