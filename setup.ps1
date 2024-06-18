@@ -45,9 +45,7 @@ function Show-Menu {
     Write-Host "7. Install Git"
     Write-Host "8. Install Docker"
     Write-Host "9. DMA klonen und einrichten"
-    Write-Host "10. DMA env variablen setzen"
-    Write-Host "11. DMA starten"
-    Write-Host "12. Exit"
+    Write-Host "10. Exit"
 }
 
 function Show-PHPVersions {
@@ -246,14 +244,32 @@ function DMA-Klonen-und-Einrichten {
         cls
         Write-Host "DMA klonen und einrichten:"
         Write-Host "1. DMA klonen"
-        Write-Host "2. Zurück zum Hauptmenü"
-        $subChoice = Read-Host "Enter your choice (1-2)"
+        Write-Host "2. DMA einrichten"
+        Write-Host "3. DMA starten"
+        Write-Host "4. Zurück zum Hauptmenü"
+        $subChoice = Read-Host "Enter your choice (1-4)"
         switch ($subChoice) {
             1 {
                 DMA-Klonen
                 Pause
             }
             2 {
+                $projectRoot = Read-Host "Enter the project root path (leave blank to use the current directory)"
+                if (-not $projectRoot) {
+                    $projectRoot = Get-Location
+                }
+                DMA-Einrichten -projectRoot $projectRoot
+                Pause
+            }
+            3 {
+                $projectRoot = Read-Host "Enter the project root path (leave blank to use the current directory)"
+                if (-not $projectRoot) {
+                    $projectRoot = Get-Location
+                }
+                DMA-Starten -projectRoot $projectRoot
+                Pause
+            }
+            4 {
                 return
             }
             default {
@@ -287,7 +303,7 @@ function DMA-Klonen {
 }
 
 # DMA environment variables setup
-function DMA-Env-Variablen-Setzen {
+function DMA-Einrichten {
     param (
         [string]$projectRoot
     )
@@ -309,7 +325,15 @@ function DMA-Env-Variablen-Setzen {
 
         Copy-Item -Path $envDevFilePath -Destination $envBaseFilePath
 
-        Write-Host "Environment variables have been set successfully."
+        Set-Location -Path $projectRoot
+        yarn install
+
+        Set-Location -Path (Join-Path -Path $projectRoot -ChildPath "dev-ops")
+        yarn dma:build
+        yarn docker:build:cds
+        yarn docker:build:dma
+
+        Write-Host "DMA environment setup completed successfully."
     } catch {
         Write-Host "Error setting environment variables: $_"
         Pause
@@ -325,14 +349,6 @@ function DMA-Starten {
     $projectRoot = Join-Path -Path $projectRoot -ChildPath "apps/dma-ukk"
 
     try {
-        Set-Location -Path $projectRoot
-        yarn install
-
-        Set-Location -Path (Join-Path -Path $projectRoot -ChildPath "dev-ops")
-        yarn dma:build
-        yarn docker:build:cds
-        yarn docker:build:dma
-
         Set-Location -Path $projectRoot
 
         docker network create web
@@ -358,7 +374,7 @@ function DMA-Starten {
 while ($true) {
     Set-ExecutionPolicy-RemoteSigned
     Show-Menu
-    $choice = Read-Host "Enter your choice (1-12)"
+    $choice = Read-Host "Enter your choice (1-10)"
     switch ($choice) {
         1 {
             Show-PHPVersions
@@ -405,22 +421,6 @@ while ($true) {
             DMA-Klonen-und-Einrichten
         }
         10 {
-            $projectRoot = Read-Host "Enter the project root path (leave blank to use the current directory)"
-            if (-not $projectRoot) {
-                $projectRoot = Get-Location
-            }
-            DMA-Env-Variablen-Setzen -projectRoot $projectRoot
-            Pause
-        }
-        11 {
-            $projectRoot = Read-Host "Enter the project root path (leave blank to use the current directory)"
-            if (-not $projectRoot) {
-                $projectRoot = Get-Location
-            }
-            DMA-Starten -projectRoot $projectRoot
-            Pause
-        }
-        12 {
             break
         }
         default {
