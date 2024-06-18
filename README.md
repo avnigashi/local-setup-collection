@@ -60,8 +60,4 @@ The Windows setup script performs the following tasks:
      ```powershell
      irm https://raw.githubusercontent.com/avnigashi/local-setup-collection/main/setup.ps1 | iex
      ```
-
-4. **Follow the Prompts**:
-   - Select and install the desired components from the menu.
-
-This will automate the setup process for various developer tools.
+     
