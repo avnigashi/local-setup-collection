@@ -229,7 +229,7 @@ function Install-Docker {
     $url = "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
     $installerPath = "$env:TEMP\DockerInstaller.exe"
     Invoke-WebRequest-Retry -url $url -outputPath $installerPath
-    Start-Process -FilePath $installerPath -ArgumentList "/quiet" -Wait
+    Start-Process -FilePath $installerPath -Wait
     if ($?) {
         Write-Host "Docker has been installed successfully."
         Add-ToPath -newPath "C:\Program Files\Docker\Docker"
