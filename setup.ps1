@@ -43,8 +43,9 @@ function Show-Menu {
     Write-Host "5. Install pnpm"
     Write-Host "6. Install Yarn"
     Write-Host "7. Install Git"
-    Write-Host "8. DMA klonen und einrichten"
-    Write-Host "9. Exit"
+    Write-Host "8. Install Docker"
+    Write-Host "9. DMA klonen und einrichten"
+    Write-Host "10. Exit"
 }
 
 function Show-PHPVersions {
@@ -223,6 +224,20 @@ function Install-Yarn-Pnpm {
     }
 }
 
+# Install Docker
+function Install-Docker {
+    $url = "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
+    $installerPath = "$env:TEMP\DockerInstaller.exe"
+    Invoke-WebRequest-Retry -url $url -outputPath $installerPath
+    Start-Process -FilePath $installerPath -ArgumentList "/quiet" -Wait
+    if ($?) {
+        Write-Host "Docker has been installed successfully."
+        Add-ToPath -newPath "C:\Program Files\Docker\Docker"
+    } else {
+        Write-Host "Failed to install Docker."
+    }
+}
+
 # DMA klonen und einrichten
 function DMA-Klonen-und-Einrichten {
     while ($true) {
@@ -336,7 +351,7 @@ function DMA-Env-Variablen-Setzen {
 while ($true) {
     Set-ExecutionPolicy-RemoteSigned
     Show-Menu
-    $choice = Read-Host "Enter your choice (1-9)"
+    $choice = Read-Host "Enter your choice (1-10)"
     switch ($choice) {
         1 {
             Show-PHPVersions
@@ -376,9 +391,13 @@ while ($true) {
             Pause
         }
         8 {
-            DMA-Klonen-und-Einrichten
+            Install-Docker
+            Pause
         }
         9 {
+            DMA-Klonen-und-Einrichten
+        }
+        10 {
             break
         }
         default {
