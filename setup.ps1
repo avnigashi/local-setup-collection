@@ -352,8 +352,11 @@ function DMA-Starten {
         Set-Location -Path $projectRoot
 
         docker network create web
-        yarn dev:backend:start
 
+        # Start the backend in a new PowerShell process
+        Start-Process powershell -ArgumentList "yarn dev:backend:start" -NoNewWindow
+
+        # Start the UI
         yarn dev:ui:install
         yarn dev:ui:start
 
