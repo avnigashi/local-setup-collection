@@ -347,7 +347,7 @@ function DMA-Starten {
     )
 
     $backendPath = Join-Path -Path $projectRoot -ChildPath "apps/dma-ukk"
-    $uiPath = Join-Path -Path $projectRoot -ChildPath "cds\apps\dma-ukk\ui"
+    $uiPath = Join-Path -Path $projectRoot -ChildPath "apps/dma-ukk/ui"
 
     try {
         Set-Location -Path $backendPath
