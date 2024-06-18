@@ -255,7 +255,7 @@ function DMA-Klonen-und-Einrichten {
 
 # DMA cloning
 function DMA-Klonen {
-    $repoUrl = "https://github.com/healexsystems/cds.git"
+    $repoUrl = "https://github.com/healexsystems/cds"
     $branchName = "asz/dma-latest"
     $targetDir = Read-Host "Enter the target directory (leave blank to use the current directory)"
     
@@ -263,7 +263,8 @@ function DMA-Klonen {
         $targetDir = Get-Location
     }
 
-    git clone --branch $branchName $repoUrl $targetDir
+    Write-Host "Cloning repository from $repoUrl into $targetDir..."
+    Start-Process -FilePath "git" -ArgumentList "clone --branch $branchName $repoUrl $targetDir" -Wait
     if ($?) {
         Write-Host "Repository cloned successfully into $targetDir."
     } else {
