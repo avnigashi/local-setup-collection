@@ -255,7 +255,7 @@ function DMA-Klonen-und-Einrichten {
 
 # DMA cloning
 function DMA-Klonen {
-    $repoUrl = "https://github.com/healexsystems/cds"
+    $repoUrl = "https://github.com/healexsystems/cds.git"
     $branchName = "asz/dma-latest"
     $targetDir = Read-Host "Enter the target directory (leave blank to use the current directory)"
     
