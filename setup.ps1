@@ -7,12 +7,14 @@ function Set-ExecutionPolicy-RemoteSigned {
         Write-Host "Execution policy is already set to RemoteSigned."
     }
 }
+
 if ($PSVersionTable.PSVersion.Major -lt 5) {
     Write-Host "You'll need at least PowerShell version 5. To determine your version, open PowerShell and type:"
     Write-Host "$PSVersionTable.PSVersion.ToString()"
     Write-Host "If you have an older version, you can upgrade it following these instructions: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell"
     exit
 }
+
 $is64Bit = [Environment]::Is64BitOperatingSystem
 $phpVersions = @{
     "7.4.33" = if ($is64Bit) { "https://windows.php.net/downloads/releases/php-7.4.33-Win32-vc15-x64.zip" } else { "https://windows.php.net/downloads/releases/php-7.4.33-Win32-vc15-x86.zip" }
@@ -21,19 +23,6 @@ $phpVersions = @{
 
 function Show-Menu {
     cls
-Write-Host " ██░ ██ ▓█████ ▄▄▄       ██▓    ▓█████ ▒██   ██▒"
-Write-Host "▓██░ ██▒▓█   ▀▒████▄    ▓██▒    ▓█   ▀ ▒▒ █ █ ▒░"
-Write-Host "▒██▀▀██░▒███  ▒██  ▀█▄  ▒██░    ▒███   ░░  █   ░"
-Write-Host "░▓█ ░██ ▒▓█  ▄░██▄▄▄▄██ ▒██░    ▒▓█  ▄  ░ █ █ ▒ "
-Write-Host "░▓█▒░██▓░▒████▒▓█   ▓██▒░██████▒░▒████▒▒██▒ ▒██▒"
-Write-Host " ▒ ░░▒░▒░░ ▒░ ░▒▒   ▓▒█░░ ▒░▓  ░░░ ▒░ ░▒▒ ░ ░▓ ░"
-Write-Host " ▒ ░▒░ ░ ░ ░  ░ ▒   ▒▒ ░░ ░ ▒  ░ ░ ░  ░░░   ░▒ ░"
-Write-Host " ░  ░░ ░   ░    ░   ▒     ░ ░      ░    ░    ░  "
-Write-Host " ░  ░  ░   ░  ░     ░  ░    ░  ░   ░  ░ ░    ░  "
-Write-Host "                                                "
-
-    Write-Host "'                                "
-
     Write-Host "Select an option to install:"
     Write-Host "1. Install PHP"
     Write-Host "2. Install Composer"
@@ -44,7 +33,8 @@ Write-Host "                                                "
     Write-Host "7. Install Git"
     Write-Host "8. Install Docker"
     Write-Host "9. Projekt Aufsetzen"
-    Write-Host "10. Exit"
+    Write-Host "10. Software Status"
+    Write-Host "11. Exit"
 }
 
 function Show-ProjektAufsetzenMenu {
@@ -530,10 +520,67 @@ function SF-Starten {
     }
 }
 
+function Show-SoftwareStatus {
+    $softwareList = @(
+        @{
+            Name = "PHP"
+            Command = "php"
+            VersionArg = "-v"
+        },
+        @{
+            Name = "Composer"
+            Command = "composer"
+            VersionArg = "--version"
+        },
+        @{
+            Name = "Node.js"
+            Command = "node"
+            VersionArg = "--version"
+        },
+        @{
+            Name = "npm"
+            Command = "npm"
+            VersionArg = "--version"
+        },
+        @{
+            Name = "pnpm"
+            Command = "pnpm"
+            VersionArg = "--version"
+        },
+        @{
+            Name = "Yarn"
+            Command = "yarn"
+            VersionArg = "--version"
+        },
+        @{
+            Name = "Git"
+            Command = "git"
+            VersionArg = "--version"
+        },
+        @{
+            Name = "Docker"
+            Command = "docker"
+            VersionArg = "--version"
+        }
+    )
+
+    foreach ($software in $softwareList) {
+        $version = Get-CommandVersion -command $software.Command -versionArg $software.VersionArg
+        if ($version) {
+            $path = (Get-Command $software.Command).Path
+            Write-Host "$($software.Name) is installed: $version"
+            Write-Host "Path: $path"
+        } else {
+            Write-Host "$($software.Name) is not installed."
+        }
+        Write-Host ""
+    }
+}
+
 while ($true) {
     Set-ExecutionPolicy-RemoteSigned
     Show-Menu
-    $choice = Read-Host "Enter your choice (1-10)"
+    $choice = Read-Host "Enter your choice (1-11)"
     switch ($choice) {
         1 {
             Show-PHPVersions
@@ -597,6 +644,10 @@ while ($true) {
             }
         }
         10 {
+            Show-SoftwareStatus
+            Pause
+        }
+        11 {
             break
         }
         default {
