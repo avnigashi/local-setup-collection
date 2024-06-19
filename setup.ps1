@@ -21,18 +21,17 @@ $phpVersions = @{
 
 function Show-Menu {
     cls
-    Write-Host ""
-    Write-Host "'   ▄▄▄    ██▒   █▓ ███▄    █  ██▓"
-    Write-Host "'  ▒████▄ ▓██░   █▒ ██ ▀█   █ ▓██▒"
-    Write-Host "'  ▒██  ▀█▄▓██  █▒░▓██  ▀█ ██▒▒██▒"
-    Write-Host "'  ░██▄▄▄▄██▒██ █░░▓██▒  ▐▌██▒░██░"
-    Write-Host "'   ▓█   ▓██▒▒▀█░  ▒██░   ▓██░░██░"
-    Write-Host "'   ▒▒   ▓▒█░░ ▐░  ░ ▒░   ▒ ▒ ░▓  "
-    Write-Host "'    ▒   ▒▒ ░░ ░░  ░ ░░   ░ ▒░ ▒ ░"
-    Write-Host "'    ░   ▒     ░░     ░   ░ ░  ▒ ░"
-    Write-Host "'        ░  ░   ░           ░  ░  "
-    Write-Host "'              ░                   "
-    Write-Host "'              ░                   "
+Write-Host " ██░ ██ ▓█████ ▄▄▄       ██▓    ▓█████ ▒██   ██▒"
+Write-Host "▓██░ ██▒▓█   ▀▒████▄    ▓██▒    ▓█   ▀ ▒▒ █ █ ▒░"
+Write-Host "▒██▀▀██░▒███  ▒██  ▀█▄  ▒██░    ▒███   ░░  █   ░"
+Write-Host "░▓█ ░██ ▒▓█  ▄░██▄▄▄▄██ ▒██░    ▒▓█  ▄  ░ █ █ ▒ "
+Write-Host "░▓█▒░██▓░▒████▒▓█   ▓██▒░██████▒░▒████▒▒██▒ ▒██▒"
+Write-Host " ▒ ░░▒░▒░░ ▒░ ░▒▒   ▓▒█░░ ▒░▓  ░░░ ▒░ ░▒▒ ░ ░▓ ░"
+Write-Host " ▒ ░▒░ ░ ░ ░  ░ ▒   ▒▒ ░░ ░ ▒  ░ ░ ░  ░░░   ░▒ ░"
+Write-Host " ░  ░░ ░   ░    ░   ▒     ░ ░      ░    ░    ░  "
+Write-Host " ░  ░  ░   ░  ░     ░  ░    ░  ░   ░  ░ ░    ░  "
+Write-Host "                                                "
+
     Write-Host "'                                "
 
     Write-Host "Select an option to install:"
