@@ -402,7 +402,7 @@ function DMA-Einrichten {
         Start-Process powershell -ArgumentList "yarn install" 
  
         Set-Location -Path $projectRoot2
-        Set-Location -Path (Join-Path -Path $projectRoot -ChildPath "dev-ops")
+        Set-Location -Path (Join-Path -Path $projectRoot2 -ChildPath "dev-ops")
         Start-Process powershell -ArgumentList "yarn run dma:build" 
         Start-Process powershell -ArgumentList "yarn run docker:build:cds" 
         Start-Process powershell -ArgumentList "yarn run docker:build:dma" 
