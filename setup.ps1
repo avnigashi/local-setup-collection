@@ -21,12 +21,20 @@ $phpVersions = @{
 
 function Show-Menu {
     cls
-    Write-Host ".------..------..------..------."
-    Write-Host "|A.--. ||V.--. ||N.--. ||I.--. |"
-    Write-Host "| (\/) || :(): || :(): || (\/) |"
-    Write-Host "| :\/: || ()() || ()() || :\/: |"
-    Write-Host "| '--'A|| '--'V|| '--'N|| '--'I|"
-    Write-Host "`------'`------'`------'`------'"
+    Write-Host ""
+    Write-Host "'   ▄▄▄    ██▒   █▓ ███▄    █  ██▓"
+    Write-Host "'  ▒████▄ ▓██░   █▒ ██ ▀█   █ ▓██▒"
+    Write-Host "'  ▒██  ▀█▄▓██  █▒░▓██  ▀█ ██▒▒██▒"
+    Write-Host "'  ░██▄▄▄▄██▒██ █░░▓██▒  ▐▌██▒░██░"
+    Write-Host "'   ▓█   ▓██▒▒▀█░  ▒██░   ▓██░░██░"
+    Write-Host "'   ▒▒   ▓▒█░░ ▐░  ░ ▒░   ▒ ▒ ░▓  "
+    Write-Host "'    ▒   ▒▒ ░░ ░░  ░ ░░   ░ ▒░ ▒ ░"
+    Write-Host "'    ░   ▒     ░░     ░   ░ ░  ▒ ░"
+    Write-Host "'        ░  ░   ░           ░  ░  "
+    Write-Host "'              ░                   "
+    Write-Host "'              ░                   "
+    Write-Host "'                                "
+
     Write-Host "Select an option to install:"
     Write-Host "1. Install PHP"
     Write-Host "2. Install Composer"
