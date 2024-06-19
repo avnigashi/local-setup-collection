@@ -369,12 +369,12 @@ function DMA-Einrichten {
     )
     
     $uiPath = Join-Path -Path $projectRoot -ChildPath "apps/dma-ukk/ui"
-    $projectRoot = Join-Path -Path $projectRoot -ChildPath "apps/dma-ukk"
+    $projectRoot2 = Join-Path -Path $projectRoot -ChildPath "apps/dma-ukk"
 
     try {
-        $envFilePath = Join-Path -Path $projectRoot -ChildPath "dev-ops\stacks\.env.template"
-        $envDevFilePath = Join-Path -Path $projectRoot -ChildPath "dev-ops\stacks\.env.dev"
-        $envBaseFilePath = Join-Path -Path $projectRoot -ChildPath "dev-ops\stacks\.env.base"
+        $envFilePath = Join-Path -Path $projectRoot2 -ChildPath "dev-ops\stacks\.env.template"
+        $envDevFilePath = Join-Path -Path $projectRoot2 -ChildPath "dev-ops\stacks\.env.dev"
+        $envBaseFilePath = Join-Path -Path $projectRoot2 -ChildPath "dev-ops\stacks\.env.base"
 
         Copy-Item -Path $envFilePath -Destination $envDevFilePath
 
@@ -386,18 +386,19 @@ function DMA-Einrichten {
 
         Copy-Item -Path $envDevFilePath -Destination $envBaseFilePath
 
-        Set-Location -Path $projectRoot
+        Set-Location -Path $projectRoot2
         
         Start-Process powershell -ArgumentList "yarn install" 
 
         Set-Location -Path $uiPath
         Start-Process powershell -ArgumentList "yarn install" 
  
-        Set-Location -Path $projectRoot
+        Set-Location -Path $projectRoot2
         Set-Location -Path (Join-Path -Path $projectRoot -ChildPath "dev-ops")
         Start-Process powershell -ArgumentList "yarn run dma:build" 
         Start-Process powershell -ArgumentList "yarn run docker:build:cds" 
         Start-Process powershell -ArgumentList "yarn run docker:build:dma" 
+        Set-Location -Path $projectRoot
 
         Write-Host "DMA environment setup completed successfully."
     } catch {
@@ -430,6 +431,7 @@ function DMA-Starten {
         Start-Process powershell -ArgumentList "yarn dev"
 
         Write-Host "Open the application at http://localhost:8080/"
+        Set-Location -Path $projectRoot
 
         Write-Host "If you see 'Einrichten', please enter the following:"
         Write-Host "Username: (e.g. admin)"
