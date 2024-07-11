@@ -65,6 +65,24 @@ else
     check_status "Docker"
 fi
 
+# Install Docker Compose if not already installed
+if ! docker compose version &> /dev/null; then
+    echo "Docker Compose not found. Installing Docker Compose..."
+    sudo curl -L "https://github.com/docker/compose/releases/download/v2.15.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+    check_status "Docker Compose installation"
+else
+    prompt_reinstall "Docker Compose"
+    if [ $? -eq 0 ]; then
+        echo "Reinstalling Docker Compose..."
+        sudo curl -L "https://github.com/docker/compose/releases/download/v2.15.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+        check_status "Docker Compose reinstallation"
+    else
+        echo "Skipping Docker Compose installation."
+    fi
+fi
+
 # Start and enable Docker service
 echo "Starting and enabling Docker service..."
 sudo systemctl start docker
